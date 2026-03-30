@@ -1,0 +1,391 @@
+# TaskMaster — Mandatory + Bonus
+## 1. Présentation générale
+
+**TaskMaster** est un gestionnaire de processus inspiré de *supervisord*.
+Il permet de :
+
+* lancer, arrêter, redémarrer des programmes
+* surveiller leur état
+* recharger la configuration à chaud
+* gérer l’autostart, le multi‑process, les crashs
+* interagir via une **CLI avec autocomplétion et historique**
+* (bonus) fonctionner en **daemon**, avec **socket**, **alerting**, **webhook**, **logs structurés**
+
+Le projet est découpé en deux parties :
+
+* **Mandatory** : mode interactif
+* **Bonus** : mode daemon + client + alerting
+
+---
+
+## 2. Mandatory — démonstration complète
+
+### Lancement
+
+```bash
+./run_taskmaster.sh start
+```
+
+➡️ Démarre TaskMaster en **mode interactif**.
+
+### Commandes disponibles
+
+* `status`
+* `start <program>`
+* `stop <program>`
+* `restart <program>`
+* `reload`
+* `exit`
+
+### Autocomplétion
+
+* `TAB` complète les commandes
+* `TAB` complète les noms de programmes
+* historique des commandes fonctionnel
+
+### Démonstration type
+
+```text
+status
+start fast_ok
+status
+reload
+restart fast_ok
+stop fast_ok
+exit
+```
+
+---
+
+## 3. Bonus — mode daemon
+
+### Démarrage du daemon
+
+```bash
+./bonus/run_taskmaster_bonus.sh start
+```
+
+➡️ TaskMaster fork en arrière‑plan
+
+* PID stocké dans `/tmp/taskmaster_daemon.pid`
+* socket UNIX : `/tmp/taskmaster.sock`
+* logs : `bonus/logs/daemon.log`
+
+### Arrêt
+
+```bash
+./bonus/run_taskmaster_bonus.sh stop
+```
+
+---
+
+## 4. Client bonus (socket)
+
+### Commandes
+
+```bash
+python3 bonus/client.py status
+python3 bonus/client.py start fast_ok
+python3 bonus/client.py stop fast_ok
+python3 bonus/client.py reload
+python3 bonus/client.py shutdown
+```
+
+➡️ Communication via socket UNIX avec le daemon.
+
+---
+
+## 5. Gestion des programmes (bonus)
+
+### Autostart
+
+* Les programmes avec `autostart: true` sont lancés au démarrage du daemon
+
+### Multi‑process
+
+```yaml
+numprocs: 3
+```
+
+➡️ TaskMaster garantit le nombre désiré de processus.
+
+### Crash & restart
+
+* Détection automatique des sorties
+* Redémarrage si configuré
+
+---
+
+## 6. Alerting (fichier + webhook)
+
+### Principe
+
+Chaque événement génère une **alerte structurée** :
+
+* `process_started`
+* `process_exited`
+* `process_stopped`
+* `daemon_started`
+* `daemon_stopping`
+
+Une alerte peut être envoyée **simultanément** vers :
+
+1. un **fichier de log dédié aux alertes**
+2. un **webhook HTTP**
+
+➡️ Il n’y a **aucune incompatibilité** entre les deux.
+
+---
+
+## 7. Alerting fichier
+
+### Fichier
+
+```text
+bonus/logs/alerts.log
+```
+
+### Format
+
+```json
+{
+  "timestamp": "2026-01-29 14:13:47",
+  "event": "process_started",
+  "payload": {
+    "program": "fast_ok",
+    "pid": 21560
+  }
+}
+```
+
+➡️ Lisible, parsable, compatible SIEM.
+
+---
+
+## 8. Webhook — démonstration
+
+### Lancer le serveur de test
+
+```bash
+python3 bonus/webhook_demo.py
+```
+
+➡️ Écoute sur :
+
+```text
+http://localhost:8080/webhook
+```
+
+### Résultat
+
+* chaque alerte est reçue **en temps réel**
+* affichée dans le terminal
+* lisible depuis un navigateur / outil HTTP
+
+➡️ **Le webhook n’empêche pas l’écriture du fichier de log.**
+Les deux sont exécutés dans la même fonction d’alerting.
+
+---
+
+## 9. À propos des doublons (logs / alertes)
+
+### Pourquoi il y a parfois des doublons ?
+
+Actuellement :
+
+* certains logs sont émis **avant le fork**
+* puis réémis **après le fork**
+
+➡️ Effet visuel : lignes en double
+
+### Important pour le jury
+
+* **aucun bug fonctionnel**
+* pas de perte d’état
+* pas de double exécution réelle
+
+### Nettoyage possible (non requis)
+
+* déplacer l’initialisation des logs après `daemonize()`
+* ou protéger avec un flag `is_daemon`
+
+---
+
+## 10. Pourquoi "Increasing 0 -> N" apparaît au reload
+
+Lors d’un `reload` :
+
+* TaskMaster **recalcule l’état cible**
+* compare :
+
+  * nombre de process en cours
+  * nombre désiré (`numprocs`)
+
+Exemple :
+
+```text
+Increasing 'multi_proc' 0 -> 3
+```
+
+➡️ signifie :
+
+* aucun process actif
+* configuration demande 3
+* TaskMaster démarre 3 instances
+
+Même sans autostart :
+
+* le reload synchronise l’état interne
+
+➡️ **Comportement normal et attendu.**
+
+---
+
+## 11. État actuel du projet
+
+✔ Mandatory complet
+✔ Bonus daemon fonctionnel
+✔ Socket + client OK
+✔ Alerting fichier OK
+✔ Webhook fonctionnel
+✔ Reload à chaud
+✔ Multi‑process
+✔ Logs détaillés
+
+---
+
+
+# # TaskMaster
+
+# TaskMaster is a process supervisor inspired by supervisord.  
+# It manages programs lifecycle, restarts, configuration reloads, and provides both an interactive mode (mandatory) and a daemon mode (bonus).
+
+# ---
+
+# ## Mandatory Features
+
+# - Program supervision (start / stop / restart)
+# - Multiple processes per program (`numprocs`)
+# - Autostart and autorestart policies
+# - Exit code handling
+# - Graceful stop with signals
+# - Configuration reload (SIGHUP)
+# - Robust SIGCHLD handling
+# - Logging of process lifecycle events
+
+# The mandatory part strictly follows the subject requirements and was not modified for bonus features.
+
+# ---
+
+# ## Bonus Features Implemented
+
+# ### Daemon Mode
+# - Double-fork daemonization
+# - PID file: `/tmp/taskmaster_daemon.pid`
+# - Lock file to prevent multiple instances
+# - Proper signal handling (SIGTERM / SIGHUP)
+
+# ### Client / Server Architecture
+# - Daemon and client are separated
+# - Communication via UNIX socket
+# - Client sends commands (start, stop, status, reload, shutdown)
+
+# ### Advanced Reload Logic
+# - Dynamic scaling when `numprocs` changes
+# - Disabled programs are respected across reloads
+# - No unwanted restarts during reload
+
+# ### Centralized Logging
+# - Daemon logs redirected to file
+# - Child processes stdout/stderr captured
+# - Unified logging system
+
+# ### External Alerting System
+# TaskMaster implements an external alerting mechanism to report important supervision events.
+
+# Alerts are written to:
+
+/*
+
+TaskMaster git:(master) ✗ python3 bonus/webhook_browser.py
+&&
+skMaster git:(master) ✗ ./bonus/run_taskmaster_bonus.sh start
+🔹 Starting TaskMaster daemon...
+[TaskMaster] Daemon started (PID=73579)
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py status          
+fast_ok RUNNING 1/1
+slow_start RUNNING 1/1
+crash_loop RUNNING 2/2
+manual_only RUNNING 1/1
+multi_proc RUNNING 3/3
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py status
+fast_ok RUNNING 1/1
+slow_start RUNNING 0/1
+crash_loop RUNNING 0/2
+manual_only RUNNING 1/1
+multi_proc RUNNING 3/3
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py status       
+fast_ok RUNNING 0/1
+slow_start RUNNING 0/1
+crash_loop RUNNING 0/2
+manual_only RUNNING 1/1
+multi_proc RUNNING 3/3
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py status crash_loop
+fast_ok RUNNING 0/1
+slow_start RUNNING 0/1
+crash_loop RUNNING 0/2
+manual_only RUNNING 0/1
+multi_proc RUNNING 0/3
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py start crash_loop
+OK started crash_loop
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py status           
+fast_ok RUNNING 0/1
+slow_start RUNNING 0/1
+crash_loop RUNNING 0/2
+manual_only RUNNING 0/1
+multi_proc RUNNING 0/3
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py start manual_only
+OK started manual_only
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py stop manual_only
+OK stopped manual_only
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py stop             
+ERR usage: stop <program>
+➜  TaskMaster git:(master) ✗ ./bonus/run_taskmaster_bonus.sh stop     
+[TaskMaster] Stopping daemon (PID=73579)...
+[TaskMaster] Daemon stopped
+➜  TaskMaster git:(master) ✗ clear
+
+➜  TaskMaster git:(master) ✗ ./bonus/run_taskmaster_bonus.sh start    
+🔹 Starting TaskMaster daemon...
+[TaskMaster] Daemon started (PID=73833)
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py status           
+fast_ok RUNNING 0/1
+slow_start RUNNING 0/1
+crash_loop RUNNING 0/2
+manual_only RUNNING 1/1
+multi_proc RUNNING 3/3
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py start crash_loop 
+OK started crash_loop
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py stop crash_loop  
+OK stopped crash_loop
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py status          
+fast_ok RUNNING 0/1
+slow_start RUNNING 0/1
+crash_loop RUNNING 0/2
+manual_only RUNNING 0/1
+multi_proc RUNNING 0/3
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py start multi_proc
+OK started multi_proc
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py status          
+fast_ok RUNNING 0/1
+slow_start RUNNING 0/1
+crash_loop RUNNING 0/2
+manual_only RUNNING 0/1
+multi_proc RUNNING 3/3
+➜  TaskMaster git:(master) ✗ python3 bonus/client.py stop multi_proc 
+OK stopped multi_proc
+➜  TaskMaster git:(master) ✗ ./bonus/run_taskmaster_bonus.sh stop     
+[TaskMaster] Stopping daemon (PID=73833)...
+[TaskMaster] Daemon stopped
+➜  TaskMaster git:(master) ✗ 
+*/

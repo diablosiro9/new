@@ -1,0 +1,101 @@
+programs:
+
+  fast_ok:
+    cmd: "bash -c 'echo FAST_OK_START; sleep 10; exit 0'"
+    numprocs: 1
+    autostart: true
+    autorestart: never
+    stdout: "/tmp/fast_ok.out"
+    stderr: "/tmp/fast_ok.err"
+    startsecs: 1
+    startretries: 1
+    exitcodes: [0]
+
+  slow_start:
+    cmd: "bash -c 'echo SLOW_START; sleep 6; exit 0'"
+    numprocs: 1
+    autostart: true
+    autorestart: always
+    stdout: "/tmp/slow_start.out"
+    stderr: "/tmp/slow_start.err"
+    startsecs: 5
+    startretries: 2
+    exitcodes: [0]
+
+  crash_loop:
+    cmd: "bash -c 'echo CRASHING; sleep 1; exit 1'"
+    numprocs: 2
+    autostart: true
+    autorestart: always
+    stdout: "/tmp/crash_loop.out"
+    stderr: "/tmp/crash_loop.err"
+    startsecs: 3
+    startretries: 3
+    exitcodes: [0]
+
+  manual_only:
+    cmd: "bash -c 'echo MANUAL_ONLY; sleep 20; exit 0'"
+    numprocs: 1
+    autostart: false
+    autorestart: never
+    stdout: "/tmp/manual_only.out"
+    stderr: "/tmp/manual_only.err"
+    startsecs: 1
+    startretries: 0
+    exitcodes: [0]
+
+  multi_proc:
+    cmd: "bash -c 'echo MULTI_PROC $$; sleep 15; exit 0'"
+    numprocs: 3
+    autostart: true
+    autorestart: unexpected
+    stdout: "/tmp/multi_proc.out"
+    stderr: "/tmp/multi_proc.err"
+    startsecs: 2
+    startretries: 1
+    exitcodes: [0]
+
+# programs:
+#   sleep_test:
+#     cmd: "bash -c 'echo SLEEP_TEST_DIIII; sleep 5; exit 0'"
+#     numprocs: 4
+#     autostart: true
+#     autorestart: always
+#     stdout: "/tmp/sleep_test.out"
+#     stderr: "/tmp/sleep_test.err"
+#     startsecs: 2
+#     startretries: 3
+#     exitcodes: [0]
+
+#   worker:
+#     cmd: "bash -c 'echo WORKER_VERSION; sleep 7; exit 0'"
+#     numprocs: 2
+#     autostart: true
+#     autorestart: always
+#     stdout: "/tmp/worker.out"
+#     stderr: "/tmp/worker.err"
+#     startsecs: 1
+#     startretries: 2
+#     exitcodes: [0]
+
+#   quick_task:
+#     cmd: "bash -c 'echo QUICK_TASK; sleep 3; exit 0'"
+#     numprocs: 1
+#     autostart: false
+#     autorestart: always
+#     stdout: "/tmp/quick_task.out"
+#     stderr: "/tmp/quick_task.err"
+#     startsecs: 1
+#     startretries: 2
+#     exitcodes: [0]
+
+#   crash_test:
+#     cmd: "bash -c 'echo CRASHING; sleep 1; exit 1'"
+#     numprocs: 1
+#     autostart: true
+#     autorestart: always
+#     stdout: "/tmp/crash_test.out"
+#     stderr: "/tmp/crash_test.err"
+#     startsecs: 1
+#     startretries: 2
+#     exitcodes: [0]

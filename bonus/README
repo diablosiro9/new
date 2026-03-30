@@ -1,0 +1,27 @@
+# TaskMaster Bonus – Alerting
+
+## Objectif
+Ajouter un système d’alertes pour les événements critiques des processus supervisés :
+- Démarrage (`process_started`)
+- Arrêt (`process_stopped`)
+- Crash ou fin de processus (`process_exited`)
+
+Ces alertes sont écrites dans `bonus/logs/alerts.log` au format JSON, avec timestamp et payload.
+
+---
+
+## Fichiers principaux
+
+- `bonus/manager_wrapper.py` : wrapper du `ProcessManager` avec alerting.
+- `bonus/daemon.py` : daemon principal utilisant le `ManagerWrapper`.
+- `bonus/logs/alerts.log` : fichier où sont consignées toutes les alertes.
+- `bonus/logger.py` : journalisation classique.
+
+---
+
+## Exemple de contenu `alerts.log`
+
+```json
+{"timestamp": "2026-01-28 17:00:00", "event": "process_started", "payload": {"program": "fast_ok", "pid": 12345}}
+{"timestamp": "2026-01-28 17:00:05", "event": "process_exited", "payload": {"program": "fast_ok", "pid": 12345}}
+{"timestamp": "2026-01-28 17:00:06", "event": "process_stopped", "payload": {"program": "manual_only", "pid": 12346}}
