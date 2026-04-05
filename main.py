@@ -1,7 +1,7 @@
 import os  # Importe le module os pour interagir avec le système (PID, fichiers, etc.)
 import sys  # Importe le module sys pour accéder aux arguments du programme et contrôler l'exécution
-from config.loader import ConfigLoader  # Importe une classe qui sert à charger le fichier de configuration
-from process.manager import ProcessManager  # Importe une classe qui gère les programmes/processus
+from config.loader import ConfigLoader
+from process.manager import ProcessManager
 from shell.control import ControlShell  # Importe une classe qui gère le shell interactif (interface utilisateur)
 
 PID_FILE = "/tmp/taskmaster.pid"  # Définit le chemin d’un fichier où sera stocké le PID du programme

@@ -1,4 +1,4 @@
-import yaml  # Importe la bibliothèque PyYAML pour lire les fichiers YAML
+import yaml
 from config.program_config import ProgramConfig  # Importe la classe de configuration d’un programme
 from process.program import Program  # Importe la classe Program (qui contient les instances)
 

@@ -73,16 +73,14 @@ def main():  # Fonction principale
     loader = ConfigLoader(config_path)  # Initialise loader
     programs = loader.load()  # Charge programmes
 
-    manager.manager.programs = {}  # Reset programmes
-
     for program in programs:  # Ajoute chaque programme
-        manager.manager.add_program(program)
+        manager.add_program(program)
 
-    # 1️⃣ Initialiser toutes les instances avant autostart
-    for prog in manager.manager.programs.values():  # Parcourt programmes
-        prog.processes = [ProcessInstance() for _ in range(prog.config.numprocs)]  # Crée instances
-        for inst in prog.processes:
-            inst.state = ProcessState.STOPPED  # Met état STOPPED
+    # # 1️⃣ Initialiser toutes les instances avant autostart
+    # for prog in manager.manager.programs.values():  # Parcourt programmes
+    #     prog.processes = [ProcessInstance() for _ in range(prog.config.numprocs)]  # Crée instances
+    #     for inst in prog.processes:
+    #         inst.state = ProcessState.STOPPED  # Met état STOPPED
 
     # 2️⃣ Lancer les programmes avec autostart
     for prog in manager.manager.programs.values():

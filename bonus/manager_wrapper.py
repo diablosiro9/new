@@ -44,99 +44,49 @@ class ManagerWrapper:  # Wrapper autour du ProcessManager pour ajouter des featu
         send_webhook(alert)  # Envoie webhook
 
     # --- start / stop / reload / tail_child comme avant ---
-    def start_program(self, name):  # Démarre un programme
-        if name in self.disabled_programs:  # Si désactivé
+    def start_program(self, name):
+        if name in self.disabled_programs:
             self.log(f"Program '{name}' is disabled, not starting")
             return
 
-        program = self.manager.programs.get(name)  # Récupère programme
+        program = self.manager.programs.get(name)
         if not program:
             self.log(f"Program '{name}' not found")
             return
 
-        for inst in program.processes:  # Parcourt instances
-            if inst.state != ProcessState.STOPPED:  # Ignore si déjà lancé
-                continue
+        # 👉 UTILISE le vrai manager
+        self.manager.start_program(name)
 
-            if program.config.attachable:  # Si mode attachable (PTY)
-                master_fd, slave_fd = self.pty_manager.create_pty()  # Crée PTY
-                pid = os.fork()  # Fork process
-
-                if pid == 0:  # Process enfant
-                    try:
-                        os.setsid()  # Nouvelle session
-                        fcntl.ioctl(slave_fd, termios.TIOCSCTTY, 0)  # Associe terminal
-                        os.dup2(slave_fd, 0)  # stdin
-                        os.dup2(slave_fd, 1)  # stdout
-                        os.dup2(slave_fd, 2)  # stderr
-                        os.close(master_fd)  # Ferme master côté enfant
-                        os.close(slave_fd)
-
-                        if program.config.user:  # Si utilisateur défini
-                            pw = pwd.getpwnam(program.config.user)  # Récupère infos user
-                            os.setgid(pw.pw_gid)  # Change groupe
-                            os.setuid(pw.pw_uid)  # Change user
-
-                        os.execv("/bin/sh", ["sh", "-c", program.config.cmd])  # Exécute commande
-                    except Exception as e:
-                        print(f"PTY exec failed: {e}", flush=True)
-                        os._exit(1)
-                else:
-                    os.close(slave_fd)  # Ferme slave côté parent
-                    inst.mark_started(pid)  # Marque comme démarré
-                    inst.pty_master_fd = master_fd  # Stocke master fd
-                    inst.is_attachable = True  # Rend attachable
-                    self.pty_manager.register(pid, master_fd)  # Enregistre session
-                    self.log(f"[Daemon] Started attachable '{name}' pid={pid}")
-
-            else:
-                # 👇 ancien comportement pipe
-                r, w = os.pipe()  # Crée pipe (lecture/écriture)
-                pid = os.fork()
-
-                if pid == 0:  # Enfant
-                    try:
-                        os.dup2(w, 1)  # Redirige stdout
-                        os.dup2(w, 2)  # Redirige stderr
-                        os.close(r)
-                        os.close(w)
-
-                        if program.config.user:
-                            try:
-                                pw = pwd.getpwnam(program.config.user)
-                                os.setgid(pw.pw_gid)
-                                os.setuid(pw.pw_uid)
-                            except KeyError:
-                                self.log(f"User '{program.config.user}' not found", level="ERROR")
-                                os._exit(1)
-
-                        os.execv("/bin/sh", ["sh", "-c", program.config.cmd])
-                    except Exception as e:
-                        print(f"Failed to exec {program.config.cmd}: {e}", flush=True)
-                        os._exit(1)
-                else:
-                    os.close(w)
-                    inst.mark_started(pid)
-                    self.log(f"[Daemon] Started '{name}' with pid {pid}")
-
-                    t = threading.Thread(target=self._tail_child, args=(pid, r, name), daemon=True)
-                    t.start()  # Lance thread lecture logs
-
-    def _tail_child(self, pid, fd, prog_name):  # Lit la sortie d’un process
-        seen = set()  # Évite doublons
+    def _tail_child(self, pid, fd, prog_name):
+        seen = set()
         while True:
             try:
-                data = os.read(fd, 1024)  # Lit données
+                data = os.read(fd, 1024)
                 if not data:
                     break
-                for line in data.decode(errors="ignore").splitlines():  # Parse lignes
-                    if line.strip() not in seen:
-                        self.log(f"[Child {pid}] {line.strip()}")
-                        seen.add(line.strip())
+                for line in data.decode(errors="ignore").splitlines():
+                    line_clean = line.strip()
+                    if line_clean not in seen:
+                        self.log(f"[Child {pid}] {line_clean}")
+                        seen.add(line_clean)
+                        
+                        # Envoi au webhook HTTP
+                        try:
+                            from bonus.alerting import send_alert
+                            send_alert(
+                                event="program_log",
+                                payload={
+                                    "program": prog_name,
+                                    "pid": pid,
+                                    "line": line_clean
+                                }
+                            )
+                        except Exception as e:
+                            print(f"⚠️ Failed to send program log alert: {e}", flush=True)
             except OSError:
                 break
 
-        os.close(fd)  # Ferme pipe
+        os.close(fd)
 
         if pid not in self._exited_pids:  # Évite double alerte
             self._exited_pids.add(pid)

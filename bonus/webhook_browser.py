@@ -25,14 +25,13 @@ class WebhookHandler(BaseHTTPRequestHandler):  # Classe qui gère les requêtes 
         self.send_header("Content-Type", "text/html")  # Indique que la réponse est du HTML
         self.end_headers()  # Termine les headers HTTP
 
-        # page HTML simple + auto-refresh toutes les 2s
-        html = """  # Début du contenu HTML envoyé au navigateur
+        html = """  
         <html>
         <head>
-            <title>TaskMaster Alerts</title>  # Titre de la page
-            <meta http-equiv="refresh" content="2">  # Auto-refresh de la page toutes les 2 secondes
+            <title>TaskMaster Alerts</title>  
+            <meta http-equiv="refresh" content="2"> 
             <style>  # Début des styles CSS
-                body { font-family: monospace; background: #111; color: #eee; }  # Style global de la page
+                body { font-family: monospace; background: #111; color: #eee; }  
                 li.start { color: #0f0; }  # Couleur verte pour événements de type start
                 li.stop { color: #f00; }  # Couleur rouge pour événements de type stop
                 li.exit { color: #ff0; }  # Couleur jaune pour événements de type exit

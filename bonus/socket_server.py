@@ -53,7 +53,7 @@ class SocketServer(threading.Thread):  # Classe serveur qui tourne dans un threa
                     for inst in program.processes:  # Parcourt toutes les instances du programme
                         if inst.state.name == "RUNNING" and getattr(inst, "is_attachable", False):  # Vérifie état + attachable
                             self.manager.pty_manager.attach(inst.pid, conn)  # Attache le client au process via PTY
-                            return  # Sort de la méthode run (le thread est "pris" par l'attach)
+                            continue  # Sort de la méthode run (le thread est "pris" par l'attach)
 
                     conn.sendall(b"No running attachable instance\n")  # Aucun process attachable trouvé
                     conn.close()  # Ferme la connexion
