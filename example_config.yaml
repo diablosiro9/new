@@ -24,7 +24,7 @@ programs:
 
   crash_loop:
     cmd: "bash -c 'echo CRASHING; sleep 1; exit 1'"
-    numprocs: 2
+    numprocs: 3
     autostart: true
     autorestart: always
     stdout: "/tmp/crash_loop.out"

@@ -4,15 +4,30 @@ DAEMON="bonus/daemon.py"
 CONFIG_FILE="bonus.yaml"
 PID_FILE="/tmp/taskmaster_daemon.pid"
 LOCK_FILE="/tmp/taskmaster_daemon.lock"
+VENV_DIR="venv"
+
+setup_venv() {
+    if [ ! -d "$VENV_DIR" ]; then
+        echo "📦 Creating virtual environment..."
+        python3 -m venv "$VENV_DIR"
+    fi
+
+    source "$VENV_DIR/bin/activate"
+    pip install -q -r requirements.txt
+}
 
 start() {
+    setup_venv
+
     if [ -f "$PID_FILE" ] && kill -0 $(cat "$PID_FILE") 2>/dev/null; then
         echo "[TaskMaster] Daemon already running (PID=$(cat $PID_FILE))"
         exit 0
     fi
+
     echo "🔹 Starting TaskMaster daemon..."
-    python3 "$DAEMON" "$CONFIG_FILE" &
+    python "$DAEMON" "$CONFIG_FILE" &
     sleep 1
+
     for i in {1..10}; do
         if [ -f "$PID_FILE" ] && kill -0 $(cat "$PID_FILE") 2>/dev/null; then
             echo "[TaskMaster] Daemon started (PID=$(cat $PID_FILE))"
@@ -23,7 +38,6 @@ start() {
 
     echo "[TaskMaster] Failed to start daemon"
     exit 1
-
 }
 
 stop() {
@@ -31,6 +45,7 @@ stop() {
         echo "[TaskMaster] Daemon not running"
         exit 0
     fi
+
     PID=$(cat "$PID_FILE")
     echo "[TaskMaster] Stopping daemon (PID=$PID)..."
     kill -TERM "$PID"
@@ -44,6 +59,7 @@ reload() {
         echo "[TaskMaster] Daemon not running, cannot reload"
         exit 1
     fi
+
     kill -HUP $(cat "$PID_FILE")
     echo "[TaskMaster] Reload sent"
 }

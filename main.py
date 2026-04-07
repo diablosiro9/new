@@ -29,6 +29,7 @@ def main():  # Définit la fonction principale du programme
         if program.config.autostart:  # Vérifie si le programme doit démarrer automatiquement
             manager.start_program(program.config.name)  # Lance le programme si autostart est activé
 
+    manager.update_status()
     # Lance le shell
     shell = ControlShell(manager)  # Crée un shell interactif en lui passant le manager
     try:

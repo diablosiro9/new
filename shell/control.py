@@ -82,16 +82,19 @@ class ControlShell:  # Déclare la classe ControlShell (le shell interactif)
                 elif cmd.startswith("stop "):  # Si commande stop
                     name = cmd.split(maxsplit=1)[1]  # Récupère le nom
                     self.manager.stop_program(name)  # Stoppe le programme
-                elif cmd.startswith("status"):  # Si commande status
-                    parts = cmd.split()  # Découpe la commande
-                    if len(parts) == 1:  # Si pas d’argument
-                        for name, program in self.manager.programs.items():  # Parcourt tous les programmes
-                            print(self.format_status(name, program))  # Affiche leur statut
+                elif cmd.startswith("status"):
+                    # 🔹 Traite immédiatement les SIGCHLD avant de calculer le status
+                    self.manager.process_exited()
+                    
+                    parts = cmd.split()
+                    if len(parts) == 1:
+                        for name, program in self.manager.programs.items():
+                            print(self.format_status(name, program))
                     else:
-                        name = parts[1]  # Récupère le nom
-                        program = self.manager.programs.get(name)  # Cherche le programme
-                        if not program:  # S’il n’existe pas
-                            print(f"Unknown program: {name}")  # Message d’erreur
+                        name = parts[1]
+                        program = self.manager.programs.get(name)
+                        if not program:
+                            print(f"Unknown program: {name}")
                         else:
                             print(self.format_status(name, program))  # Affiche son statut
                 elif cmd == "reload":  # Si commande reload

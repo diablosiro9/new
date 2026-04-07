@@ -121,6 +121,26 @@ class ProcessManager:  # Classe principale qui gère tous les processus
         self.stop_program(name)
         self.start_program(name)
 
+    def get_status(self):
+        # 🔹 Traitement des processus terminés avant de renvoyer le status
+        self.process_exited()
+
+        status_lines = []
+        for prog in self.programs.values():
+            running = sum(1 for inst in prog.processes if inst.state == ProcessState.RUNNING)
+            total = len(prog.processes)
+            retries = sum(inst.retry_count for inst in prog.processes)
+            line = f"{prog.config.name}: { 'RUNNING' if running else 'STOPPED' } ({running}/{total}) retries={retries}"
+            status_lines.append(line)
+        return "\n".join(status_lines)
+
+    # 🔹 nouvelle méthode dans ProcessManager
+    def update_status(self):
+        """
+        Force le traitement des processus terminés en attente (SIGCHLD)
+        pour que le status reflète immédiatement l'état réel.
+        """
+        self.process_exited()
     # =========================
     # SIGCHLD
     # =========================
