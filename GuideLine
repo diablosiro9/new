@@ -1,0 +1,93 @@
+# 1. Lancer TaskMaster en mode foreground (shell interactif)
+./taskmaster start
+# -> Shell interactif visible
+# -> Vérifier que tous les programmes autostart=true démarrent
+
+# 2. Vérifier le status des programmes
+taskmaster> status
+# -> Vérifier RUNNING / STOPPED
+# -> Vérifier retries, uptime pour chaque programme
+
+# 3. Stop d’un programme spécifique
+taskmaster> stop <program_name>
+# -> Vérifier que le programme passe à STOPPED
+# -> Vérifier logs pour l’arrêt
+
+# 4. Start d’un programme spécifique
+taskmaster> start <program_name>
+# -> Vérifier que le programme passe à RUNNING
+# -> Vérifier logs pour le démarrage
+
+# 5. Restart d’un programme
+taskmaster> restart <program_name>
+# -> Vérifier que le programme s’arrête puis redémarre correctement
+# -> Vérifier logs pour stop + start
+
+# 6. Reload de la configuration YAML via SIGHUP
+kill -SIGHUP <taskmaster_pid>
+# -> Vérifier logs: 
+#    "SIGHUP received, reloading configuration..."
+#    "Reloading configuration..."
+#    "Config changed for '<program>'"
+# -> Vérifier que seuls les programmes modifiés sont redémarrés
+
+# 7. Kill d’un programme (crash)
+kill -9 <program_pid>
+# -> Vérifier que l’autorestart fonctionne si défini
+# -> Vérifier logs pour restart automatique
+# -> Vérifier status pour RUNNING correct après restart
+
+# 8. Stop du daemon foreground
+taskmaster> stop all
+# -> Vérifier que tous les programmes STOPPED
+# -> Vérifier logs pour arrêts propres
+
+----------------------------------------------------
+
+
+1 - Daemon
+# Lancer TaskMaster en mode daemon
+./bonus/run_taskmaster_bonus.sh start
+# -> Vérifier que le processus daemon s’exécute en arrière-plan
+# -> Vérifier logs pour autostart des programmes
+
+
+2 - Client CLI
+# Interroger le daemon depuis le client CLI
+python3 bonus/client.py status
+# -> Vérifier que le status reflète l’état réel des programmes
+python3 bonus/client.py stop <program_name>
+# -> Vérifier l’arrêt via daemon
+
+3 - Webhook sur Daemon
+#Avant lancement Daemon
+python3 bonus/webhook_browser.py 
+# Configurer un webhook pour notification sur reload/stop/start
+# -> Modifier YAML pour ajouter webhook
+kill -SIGHUP <daemon_pid>
+# -> Vérifier que le webhook reçoit les notifications
+
+4 - Attach 
+# Attacher un programme au daemon
+python3 bonus/client.py attach <program_name>
+# -> Vérifier que le shell montre les logs live du programme
+
+5 - Detach 
+# Détacher au daemon
+python3 /bonus/client detach
+# -> Vérifier que le shell revient au prompt normal, daemon continue 
+
+6 - De Escalation User
+# Créer un utilisateur de test
+sudo adduser testuser
+# -> Suivre les prompts pour mot de passe et informations
+
+# Vérifier droits de l’utilisateur sur le daemon
+su - testuser
+python3 bonus/client.py stop <program_restricted>
+# -> Normalement: ERR permission denied
+
+# Escalation / sudo pour arrêter un programme restreint
+sudo python3 bonus/client.py stop <program_restricted>
+# -> Vérifier que le programme s’arrête
+# -> Vérifier logs pour stop correct

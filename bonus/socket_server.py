@@ -50,14 +50,16 @@ class SocketServer(threading.Thread):  # Classe serveur qui tourne dans un threa
                         conn.close()  # Ferme connexion
                         continue  # Continue la boucle
 
-                    for inst in program.processes:  # Parcourt toutes les instances du programme
-                        if inst.state.name == "RUNNING" and getattr(inst, "is_attachable", False):  # Vérifie état + attachable
-                            self.manager.pty_manager.attach(inst.pid, conn)  # Attache le client au process via PTY
-                            continue  # Sort de la méthode run (le thread est "pris" par l'attach)
-
-                    conn.sendall(b"No running attachable instance\n")  # Aucun process attachable trouvé
-                    conn.close()  # Ferme la connexion
-                    continue  # Passe à l'itération suivante
+                    for inst in program.processes:
+                        if inst.state.name == "RUNNING" and getattr(inst, "is_attachable", False):
+                            self.manager.pty_manager.attach(inst.pid, conn)
+                            # NE PAS fermer conn ici — le thread bridge le gère
+                            break  # ← le break ne sort pas du bloc if/continue
+                    else:
+                        # Ce bloc ne s'exécute que si la boucle finit SANS break
+                        conn.sendall(b"No running attachable instance\n")
+                        conn.close()
+                    continue  # Toujours passer à la prochaine connexion
 
                 # --- COMMANDES NORMALES ---
                 response = handle_command(self.manager, command)  # Traite la commande via le handler

@@ -264,3 +264,60 @@
 {"timestamp": "2026-04-05 16:01:34", "event": "daemon_started", "payload": {"pid": 19893}}
 {"timestamp": "2026-04-05 16:02:26", "event": "daemon_stopping", "payload": {"signal": 15}}
 {"timestamp": "2026-04-05 16:02:26", "event": "process_stopped", "payload": {"program": "manual_only", "pid": 20280}}
+{"timestamp": "2026-04-07 16:46:10", "event": "daemon_started", "payload": {"pid": 15751}}
+{"timestamp": "2026-04-07 16:50:22", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 16:59:26", "event": "daemon_started", "payload": {"pid": 16313}}
+{"timestamp": "2026-04-07 17:00:32", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 17:01:15", "event": "daemon_started", "payload": {"pid": 16612}}
+{"timestamp": "2026-04-07 17:08:45", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 17:50:10", "event": "daemon_started", "payload": {"pid": 17663}}
+{"timestamp": "2026-04-07 17:52:40", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 17:52:47", "event": "daemon_started", "payload": {"pid": 17905}}
+{"timestamp": "2026-04-07 17:59:08", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 18:02:16", "event": "daemon_started", "payload": {"pid": 18409}}
+{"timestamp": "2026-04-07 18:12:46", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 18:12:53", "event": "daemon_started", "payload": {"pid": 18716}}
+{"timestamp": "2026-04-07 18:20:16", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 18:20:16", "event": "process_stopped", "payload": {"program": "shell", "pid": 18727}}
+{"timestamp": "2026-04-07 18:20:26", "event": "daemon_started", "payload": {"pid": 19052}}
+{"timestamp": "2026-04-07 18:23:48", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 18:23:48", "event": "process_stopped", "payload": {"program": "shell", "pid": 19065}}
+{"timestamp": "2026-04-07 18:24:20", "event": "daemon_started", "payload": {"pid": 19398}}
+{"timestamp": "2026-04-07 18:27:53", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 18:27:53", "event": "process_stopped", "payload": {"program": "shell", "pid": 19408}}
+{"timestamp": "2026-04-07 18:28:01", "event": "daemon_started", "payload": {"pid": 19669}}
+{"timestamp": "2026-04-07 18:30:06", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 18:30:06", "event": "process_stopped", "payload": {"program": "shell", "pid": 19677}}
+{"timestamp": "2026-04-07 18:30:16", "event": "daemon_started", "payload": {"pid": 19986}}
+{"timestamp": "2026-04-07 18:32:19", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 18:32:19", "event": "process_stopped", "payload": {"program": "shell", "pid": 19995}}
+{"timestamp": "2026-04-07 18:32:24", "event": "daemon_started", "payload": {"pid": 20226}}
+{"timestamp": "2026-04-07 18:35:31", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 18:35:31", "event": "process_stopped", "payload": {"program": "shell", "pid": 20239}}
+{"timestamp": "2026-04-07 18:35:36", "event": "daemon_started", "payload": {"pid": 20538}}
+{"timestamp": "2026-04-07 18:45:43", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 18:45:43", "event": "process_stopped", "payload": {"program": "shell", "pid": 20548}}
+{"timestamp": "2026-04-07 18:45:50", "event": "daemon_started", "payload": {"pid": 21052}}
+{"timestamp": "2026-04-07 20:28:23", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 20:28:24", "event": "process_stopped", "payload": {"program": "shell", "pid": 21064}}
+{"timestamp": "2026-04-07 20:28:27", "event": "daemon_started", "payload": {"pid": 21998}}
+{"timestamp": "2026-04-07 20:33:32", "event": "process_stopped", "payload": {"program": "manual_only", "pid": 22737}}
+{"timestamp": "2026-04-07 20:44:02", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 20:44:02", "event": "process_stopped", "payload": {"program": "shell", "pid": 22008}}
+{"timestamp": "2026-04-07 20:44:09", "event": "daemon_started", "payload": {"pid": 23265}}
+{"timestamp": "2026-04-07 20:45:17", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 20:45:17", "event": "process_stopped", "payload": {"program": "shell", "pid": 23276}}
+{"timestamp": "2026-04-07 20:45:23", "event": "daemon_started", "payload": {"pid": 23593}}
+{"timestamp": "2026-04-07 20:46:34", "event": "process_stopped", "payload": {"program": "manual_only", "pid": 23837}}
+{"timestamp": "2026-04-07 20:47:29", "event": "process_stopped", "payload": {"program": "multi_proc", "pid": 24005}}
+{"timestamp": "2026-04-07 20:54:24", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 20:54:24", "event": "process_stopped", "payload": {"program": "shell", "pid": 23602}}
+{"timestamp": "2026-04-07 20:54:30", "event": "daemon_started", "payload": {"pid": 24263}}
+{"timestamp": "2026-04-07 20:54:39", "event": "process_stopped", "payload": {"program": "multi_proc", "pid": 24270}}
+{"timestamp": "2026-04-07 20:54:39", "event": "process_stopped", "payload": {"program": "multi_proc", "pid": 24273}}
+{"timestamp": "2026-04-07 20:54:39", "event": "process_stopped", "payload": {"program": "multi_proc", "pid": 24276}}
+{"timestamp": "2026-04-07 22:02:18", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 22:02:18", "event": "process_stopped", "payload": {"program": "shell", "pid": 24280}}
+{"timestamp": "2026-04-07 22:11:06", "event": "daemon_started", "payload": {"pid": 26312}}
+{"timestamp": "2026-04-07 22:22:45", "event": "daemon_stopping", "payload": {"signal": 15}}
+{"timestamp": "2026-04-07 22:33:14", "event": "daemon_started", "payload": {"pid": 28177}}

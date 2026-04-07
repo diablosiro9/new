@@ -95,11 +95,11 @@ def main():  # Fonction principale
     socket_server.start()  # Démarre serveur
 
     # Gestion SIGTERM / SIGHUP
-    def handle_term(signum, frame):  # Handler SIGTERM
+    def handle_term(signum, frame):
         manager.send_alert("daemon_stopping", {"signal": signum})
         manager.log("[Daemon] SIGTERM received, stopping all programs...")
-        for prog in manager.programs.values():
-            manager.stop_program(prog.config.name)  # Stop tous les programmes
+        for prog in manager.programs.values():  # ← manager ici est un ManagerWrapper
+            manager.stop_program(prog.config.name)
         sys.exit(0)
 
     signal.signal(signal.SIGTERM, handle_term)  # Associe SIGTERM

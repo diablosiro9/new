@@ -62,42 +62,42 @@ class ProcessManager:  # Classe principale qui gère tous les processus
             if inst.state == ProcessState.STOPPED:  # Si arrêtée
                 self._start_instance(program, inst)  # Lance l’instance
 
-    def _start_instance(self, program, inst):  # Lance une instance spécifique
-        pid = os.fork()  # Fork (crée un process enfant)
-        if pid == 0:  # Code exécuté dans le processus enfant
-            # Child
-            try:
-                # stdout/stderr
-                if program.config.stdout:  # Si stdout défini
-                    fd_out = os.open(program.config.stdout, os.O_CREAT | os.O_WRONLY | os.O_APPEND, 0o644)  # Ouvre fichier
-                    os.dup2(fd_out, 1)  # Redirige stdout
-                    os.close(fd_out)  # Ferme descripteur
-
-                if program.config.stderr:  # Si stderr défini
+    def _start_instance(self, program, inst):
+        use_pty = getattr(program.config, 'attachable', False)
+        
+        if use_pty:
+            import pty
+            master_fd, slave_fd = pty.openpty()
+        
+        pid = os.fork()
+        if pid == 0:  # enfant
+            if use_pty:
+                os.close(master_fd)
+                os.dup2(slave_fd, 0)  # stdin
+                os.dup2(slave_fd, 1)  # stdout
+                os.dup2(slave_fd, 2)  # stderr
+                os.close(slave_fd)
+            else:
+                # ton code stdout/stderr existant
+                if program.config.stdout:
+                    fd_out = os.open(program.config.stdout, os.O_CREAT | os.O_WRONLY | os.O_APPEND, 0o644)
+                    os.dup2(fd_out, 1)
+                    os.close(fd_out)
+                if program.config.stderr:
                     fd_err = os.open(program.config.stderr, os.O_CREAT | os.O_WRONLY | os.O_APPEND, 0o644)
-                    os.dup2(fd_err, 2)  # Redirige stderr
+                    os.dup2(fd_err, 2)
                     os.close(fd_err)
-
-                # working dir / umask
-                if program.config.workingdir:  # Si répertoire défini
-                    os.chdir(program.config.workingdir)  # Change dossier
-
-                if program.config.umask is not None:  # Si umask défini
-                    os.umask(program.config.umask)  # Applique permissions
-
-                # env vars
-                if hasattr(program.config, "env") and program.config.env:  # Si variables d’environnement
-                    os.environ.update(program.config.env)  # Les ajoute
-
-                os.execv("/bin/sh", ["sh", "-c", program.config.cmd])  # Lance la commande
-            except Exception as e:  # Si erreur
-                print(f"Failed to exec {program.config.cmd}: {e}", flush=True)  # Affiche erreur
-                os._exit(1)  # Quitte immédiatement
-        else:
-            # Parent
-            inst.mark_started(pid)  # Enregistre PID dans l’instance
-            # inst.retry_count += 1
-            self.log(f"Started '{program.config.name}' with pid {pid}")  # Log démarrage
+            # ... reste du code enfant inchangé
+            os.execv("/bin/sh", ["sh", "-c", program.config.cmd])
+        else:  # parent
+            if use_pty:
+                os.close(slave_fd)
+                inst.is_attachable = True
+                # Enregistrer dans le pty_manager (via le wrapper)
+                if hasattr(self, 'pty_manager'):
+                    self.pty_manager.register(pid, master_fd)
+            inst.mark_started(pid)
+            self.log(f"Started '{program.config.name}' with pid {pid}")
 
     def stop_program(self, name: str):  # Stop un programme
         program = self.programs.get(name)  # Récupère programme

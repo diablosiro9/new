@@ -13,13 +13,19 @@ def handle_command(manager, command: str) -> str:  # Fonction principale de trai
 
     cmd = parts[0]  # Récupère le type de commande
 
-    if cmd == "status":  # Commande status
-        lines = []  # Liste des lignes de statut
-        for name, prog in manager.programs.items():  # Parcourt tous les programmes
-            running = len([p for p in prog.processes if p.state == ProcessState.RUNNING])  # Compte les process en cours
-            desired = prog.config.numprocs  # Nombre attendu d'instances
-            lines.append(f"{name} RUNNING {running}/{desired}")  # Ajoute une ligne de statut
-        return "\n".join(lines) if lines else "OK no programs"  # Retourne le statut global
+    if cmd == "status":
+        # Forcer le traitement des exits avant de lire l'état
+        if hasattr(manager, 'manager'):
+            manager.manager.process_exited()  # si ManagerWrapper
+        elif hasattr(manager, 'process_exited'):
+            manager.process_exited()
+        
+        lines = []
+        for name, prog in manager.programs.items():
+            running = len([p for p in prog.processes if p.state == ProcessState.RUNNING])
+            desired = prog.config.numprocs
+            lines.append(f"{name} RUNNING {running}/{desired}")
+        return "\n".join(lines) if lines else "OK no programs"
 
     elif cmd == "start":  # Commande start
         if len(parts) != 2:  # Vérifie les arguments

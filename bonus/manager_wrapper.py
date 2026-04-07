@@ -23,6 +23,7 @@ class ManagerWrapper:  # Wrapper autour du ProcessManager pour ajouter des featu
         self._exited_pids = set()  # PIDs déjà traités
         self.is_daemon = is_daemon  # Mode daemon ou non
         self.pty_manager = PTYManager()  # Initialise gestionnaire PTY
+        self.manager.pty_manager = self.pty_manager
 
     def log(self, message, level="INFO"):  # Wrapper log
         log(message, level, is_daemon=self.is_daemon)  # Appelle logger custom
