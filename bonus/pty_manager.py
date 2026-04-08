@@ -54,16 +54,17 @@ class PTYManager:
 
                         # Traite ligne par ligne
                         detach_requested = False
+                        # Normalise \r et \r\n en \n
+                        input_buffer = input_buffer.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
                         while b"\n" in input_buffer:
                             line, input_buffer = input_buffer.split(b"\n", 1)
                             if line.strip() == b"detach":
-                                # On NE forward PAS la commande au shell
                                 detach_requested = True
                                 break
                             else:
-                                # Forward la ligne complète au process
                                 try:
-                                    os.write(master_fd, line + b"\n")
+                                    os.write(master_fd, line + b"\r\n")  # ← renvoie \r\n au shell PTY
                                 except OSError:
                                     detach_requested = True
                                     break

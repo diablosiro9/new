@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtualenv
+venv/
+env/
+
+# Logs
+*.log
+*.out
+*.err
+logs/
+
+# Socket
+/tmp/taskmaster.sock
+
+# macOS
+.DS_Store
+
+# Éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
