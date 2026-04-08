@@ -2,7 +2,7 @@ import os
 import pty
 import select
 import threading
-
+import socket
 
 class PTYManager:
     def __init__(self):
