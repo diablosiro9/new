@@ -7,32 +7,36 @@ import os  # Accès système
 import select  # Permet d’écouter plusieurs flux (stdin + socket)
 
 SOCKET_PATH = "/tmp/taskmaster.sock"  # Chemin du socket Unix
-
-def interactive_mode(sock):  # Mode interactif (ex: attach)
-    old_settings = termios.tcgetattr(sys.stdin.fileno())  # Sauvegarde config terminal
+def interactive_mode(sock):
+    old_settings = termios.tcgetattr(sys.stdin.fileno())
     try:
-        tty.setraw(sys.stdin.fileno())  # Passe terminal en mode brut
+        tty.setraw(sys.stdin.fileno())
 
         while True:
-            rlist, _, _ = select.select([sys.stdin, sock], [], [])  # Attend input clavier OU socket
+            rlist, _, _ = select.select([sys.stdin, sock], [], [])
 
-            if sys.stdin in rlist:  # Si entrée utilisateur
-                data = os.read(sys.stdin.fileno(), 1024)  # Lit input brut
+            if sys.stdin in rlist:
+                data = os.read(sys.stdin.fileno(), 1024)
                 if not data:
                     break
-                sock.sendall(data)  # Envoie au daemon
+                sock.sendall(data)
 
-            if sock in rlist:  # Si réponse du daemon
+            if sock in rlist:
                 try:
-                    data = sock.recv(1024)  # Lit données
+                    data = sock.recv(4096)
                     if not data:
                         break
-                    os.write(sys.stdout.fileno(), data)  # Affiche directement
-                except ConnectionResetError:
+                    os.write(sys.stdout.fileno(), data)
+                    # Détecte la fin de session envoyée par le serveur
+                    if b"\r\nDetached.\r\n" in data:
+                        break
+                except (ConnectionResetError, OSError):
                     break
     finally:
-        termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old_settings)  # Restore terminal
-
+        termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old_settings)
+        # Assure un retour propre à la ligne après raw mode
+        print()
+        
 def main():  # Fonction principale
     if len(sys.argv) < 2:  # Vérifie arguments
         print("Usage: client.py <command>")

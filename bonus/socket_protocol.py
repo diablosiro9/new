@@ -24,7 +24,8 @@ def handle_command(manager, command: str) -> str:  # Fonction principale de trai
         for name, prog in manager.programs.items():
             running = len([p for p in prog.processes if p.state == ProcessState.RUNNING])
             desired = prog.config.numprocs
-            lines.append(f"{name} RUNNING {running}/{desired}")
+            state = "RUNNING" if running > 0 else "STOPPED"
+            lines.append(f"{name} {state} {running}/{desired}")
         return "\n".join(lines) if lines else "OK no programs"
 
     elif cmd == "start":  # Commande start

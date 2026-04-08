@@ -1,73 +1,110 @@
-import os  # Module pour interactions système (fichiers, process, etc.)
-import pty  # Module pour gérer les pseudo-terminals
-import tty  # Module pour manipuler les modes de terminal
-import termios  # Module bas niveau pour configuration terminal
-import select  # Permet de surveiller plusieurs flux I/O
-import threading  # Permet l'exécution concurrente via threads
+import os
+import pty
+import select
+import threading
 
-class PTYManager:  # Classe qui gère les sessions attachables via PTY
-    def __init__(self):  # Constructeur de la classe
-        self.sessions = {}  # Dictionnaire pid -> master_fd (PTY associé)
-        self.attachable = set()  # Ensemble (non utilisé ici)
-        self.attached = set()  # Ensemble des PIDs actuellement attachés
 
-    def create_pty(self):  # Méthode pour créer un pseudo-terminal
-        return pty.openpty()  # Retourne un tuple (master_fd, slave_fd)
+class PTYManager:
+    def __init__(self):
+        self.sessions = {}
+        self.attached = set()
 
-    def register(self, pid, master_fd):  # Enregistre un process avec son PTY
-        self.sessions[pid] = master_fd  # Associe le PID à son file descriptor master
+    def create_pty(self):
+        return pty.openpty()
 
-    def attach(self, pid, client_socket):  # Attache un client à un process
-        if pid not in self.sessions:  # Vérifie si le PID existe
-            client_socket.sendall(b"Process not attachable\n")  # Informe le client
-            return  # Stop si non attachable
+    def register(self, pid, master_fd):
+        self.sessions[pid] = master_fd
 
-        master_fd = self.sessions[pid]  # Récupère le PTY associé au process
+    def attach(self, pid, client_socket):
+        if pid not in self.sessions:
+            client_socket.sendall(b"ERR process not found in PTY sessions\n")
+            return
 
-        client_socket.sendall(b"Attached. Ctrl+X or type 'detach' to detach\n")  # Message d'information au client
+        if pid in self.attached:
+            client_socket.sendall(b"ERR already attached to this process\n")
+            return
 
-        def bridge():  # Fonction interne qui fait le lien client ↔ process
-            try:  # Début gestion d'erreurs
-                buffer = b""  # Buffer pour accumuler les entrées client
+        master_fd = self.sessions[pid]
+        self.attached.add(pid)
+        client_socket.sendall(b"Attached. Ctrl+X or type 'detach' to detach.\n")
 
-                while True:  # Boucle principale
-                    rlist, _, _ = select.select([client_socket, master_fd], [], [])  # Attend une activité sur l’un des deux
+        def bridge():
+            input_buffer = b""
+            try:
+                while True:
+                    try:
+                        rlist, _, _ = select.select([client_socket, master_fd], [], [], 1.0)
+                    except (ValueError, OSError):
+                        break
 
-                    if client_socket in rlist:  # Si le client envoie des données
-                        data = client_socket.recv(1024)  # Lit les données
-                        if not data:  # Si connexion fermée
-                            break  # Sort de la boucle
+                    if client_socket in rlist:
+                        try:
+                            data = client_socket.recv(1024)
+                        except OSError:
+                            break
+                        if not data:
+                            break
 
-                        buffer += data  # Ajoute au buffer
+                        # Ctrl+X détache immédiatement
+                        if b"\x18" in data:
+                            break
 
-                        # --- DETACH via Ctrl+X ---
-                        if b"\x18" in buffer:  # Ctrl+X détecté
-                            break  # Déconnexion
+                        # Accumule dans le buffer d'entrée
+                        input_buffer += data
 
-                        # --- DETACH via command ---
-                        if b"\n" in buffer:  # Ligne complète reçue
-                            line, buffer = buffer.split(b"\n", 1)  # Sépare la ligne
-                            if line.strip() == b"detach":  # Si commande detach
-                                break  # Déconnexion
-                            os.write(master_fd, line + b"\n")  # Envoie au process
-                        continue  # Continue la boucle
+                        # Traite ligne par ligne
+                        detach_requested = False
+                        while b"\n" in input_buffer:
+                            line, input_buffer = input_buffer.split(b"\n", 1)
+                            if line.strip() == b"detach":
+                                # On NE forward PAS la commande au shell
+                                detach_requested = True
+                                break
+                            else:
+                                # Forward la ligne complète au process
+                                try:
+                                    os.write(master_fd, line + b"\n")
+                                except OSError:
+                                    detach_requested = True
+                                    break
 
-                    if master_fd in rlist:  # Si le process écrit
-                        data = os.read(master_fd, 1024)  # Lit la sortie
-                        if not data:  # Si rien (process terminé)
-                            break  # Sort
-                        client_socket.sendall(data)  # Envoie au client
+                        if detach_requested:
+                            break
 
-            except (BrokenPipeError, ConnectionResetError):  # Erreurs de connexion
-                pass  # Ignorées
-            except Exception:  # Toute autre erreur
-                pass  # Ignorée
-            finally:  # Nettoyage
-                self.attached.discard(pid)  # Retire le PID des attachés
-                try:  # Tentative d'envoi message final
-                    client_socket.sendall(b"\nDetached.\n")  # Informe le client
-                except:  # Si échec
-                    pass  # Ignore
+                        # Forward ce qui reste (saisie partielle, pas encore \n)
+                        if input_buffer and not detach_requested:
+                            try:
+                                os.write(master_fd, input_buffer)
+                                input_buffer = b""
+                            except OSError:
+                                break
 
-        t = threading.Thread(target=bridge, daemon=True)  # Création d’un thread pour gérer la communication
-        t.start()  # Démarrage du thread
+                    if master_fd in rlist:
+                        try:
+                            data = os.read(master_fd, 4096)
+                        except OSError:
+                            break
+                        if not data:
+                            break
+                        try:
+                            client_socket.sendall(data)
+                        except OSError:
+                            break
+
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+            finally:
+                self.attached.discard(pid)
+                # \r\n pour reset le terminal + prompt explicite
+                try:
+                    client_socket.sendall(b"\r\nDetached.\r\n")
+                    client_socket.shutdown(socket.SHUT_RDWR)  # ← ajout
+                    client_socket.close()       
+                except OSError:
+                    pass
+                # Signal de fin de session pour que le client rende la main
+                # Si ton client écoute un sentinel, envoie-le ici
+                # ex: client_socket.sendall(b"__DETACHED__\n")
+
+        t = threading.Thread(target=bridge, daemon=True)
+        t.start()

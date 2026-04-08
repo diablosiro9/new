@@ -1,84 +1,121 @@
-import os  # Module pour interactions avec le système de fichiers et OS
-import socket  # Module pour la communication réseau (ici sockets Unix)
-import threading  # Module pour gérer les threads (exécution concurrente)
-from socket_protocol import handle_command  # Fonction qui traite les commandes reçues
-from logger import log  # Fonction de logging personnalisée
+import os
+import socket
+import threading
+from socket_protocol import handle_command
+from logger import log
 
-SOCKET_PATH = "/tmp/taskmaster.sock"  # Chemin du socket Unix utilisé pour la communication
+SOCKET_PATH = "/tmp/taskmaster.sock"
 
-class SocketServer(threading.Thread):  # Classe serveur qui tourne dans un thread
-    def __init__(self, manager):  # Constructeur prenant un manager en paramètre
-        super().__init__(daemon=True)  # Initialise le thread en mode daemon (s'arrête avec le programme principal)
-        self.manager = manager  # Stocke le manager pour accéder aux programmes
-        self.running = True  # Flag pour contrôler la boucle principale du serveur
+class SocketServer(threading.Thread):
+    def __init__(self, manager):
+        super().__init__(daemon=True)
+        self.manager = manager
+        self.running = True
 
-        if os.path.exists(SOCKET_PATH):  # Vérifie si un ancien socket existe déjà
-            os.remove(SOCKET_PATH)  # Supprime l'ancien socket pour éviter conflit
+        if os.path.exists(SOCKET_PATH):
+            os.remove(SOCKET_PATH)
 
-        self.server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)  # Crée un socket Unix en mode TCP
-        self.server.bind(SOCKET_PATH)  # Lie le socket à un chemin fichier
-        self.server.listen(5)  # Met le serveur en écoute avec une file d'attente de 5 connexions
+        self.server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.server.bind(SOCKET_PATH)
+        self.server.listen(5)
 
-        log("[Socket] Listening on /tmp/taskmaster.sock")  # Log indiquant que le serveur est prêt
+        log("[Socket] Listening on /tmp/taskmaster.sock")
 
-    def run(self):  # Méthode exécutée automatiquement quand le thread démarre
-        while self.running:  # Boucle principale tant que le serveur est actif
-            try:  # Bloc de gestion des erreurs
-                conn, _ = self.server.accept()  # Accepte une nouvelle connexion client
+    def run(self):
+        while self.running:
+            try:
+                conn, _ = self.server.accept()
 
-                data = conn.recv(1024)  # Lit jusqu'à 1024 bytes envoyés par le client
-                if not data:  # Si aucune donnée reçue
-                    conn.close()  # Ferme la connexion
-                    continue  # Passe à l'itération suivante
+                data = conn.recv(1024)
+                if not data:
+                    conn.close()
+                    continue
 
-                command = data.decode().strip()  # Décode les bytes en string et supprime espaces
-                log(f"[Socket] Command received: {command}")  # Log de la commande reçue
+                command = data.decode().strip()
+                log(f"[Socket] Command received: {command}")
 
                 # --- ATTACH ---
-                if command.startswith("attach"):  # Vérifie si la commande est un attach
-                    parts = command.split()  # Découpe la commande en parties
-                    if len(parts) != 2:  # Vérifie le format attendu
-                        conn.sendall(b"ERR usage: attach <program>\n")  # Envoie message d'erreur
-                        conn.close()  # Ferme la connexion
-                        continue  # Passe à la suite
-
-                    prog_name = parts[1]  # Récupère le nom du programme
-                    program = self.manager.programs.get(prog_name)  # Récupère le programme depuis le manager
-
-                    if not program:  # Si le programme n'existe pas
-                        conn.sendall(b"Program not found\n")  # Envoie erreur
-                        conn.close()  # Ferme connexion
-                        continue  # Continue la boucle
-
-                    for inst in program.processes:
-                        if inst.state.name == "RUNNING" and getattr(inst, "is_attachable", False):
-                            self.manager.pty_manager.attach(inst.pid, conn)
-                            # NE PAS fermer conn ici — le thread bridge le gère
-                            break  # ← le break ne sort pas du bloc if/continue
-                    else:
-                        # Ce bloc ne s'exécute que si la boucle finit SANS break
-                        conn.sendall(b"No running attachable instance\n")
+                if command.startswith("attach"):
+                    parts = command.split()
+                    if len(parts) < 2:
+                        conn.sendall(b"ERR usage: attach <program[:index]>\n")
                         conn.close()
-                    continue  # Toujours passer à la prochaine connexion
+                        continue
+
+                    target = parts[1]
+
+                    # Parse optionnel program:index
+                    if ":" in target:
+                        prog_name, idx_str = target.split(":", 1)
+                        try:
+                            index = int(idx_str)
+                        except ValueError:
+                            conn.sendall(b"ERR invalid instance index\n")
+                            conn.close()
+                            continue
+                    else:
+                        prog_name = target
+                        index = None  # Première instance RUNNING attachable
+
+                    program = self.manager.programs.get(prog_name)
+                    if not program:
+                        conn.sendall(b"ERR program not found\n")
+                        conn.close()
+                        continue
+
+                    # Chercher l'instance cible
+                    attached = False
+                    if index is not None:
+                        # Instance précise demandée
+                        if index >= len(program.processes):
+                            conn.sendall(b"ERR instance index out of range\n")
+                            conn.close()
+                            continue
+                        inst = program.processes[index]
+                        if inst.state.name != "RUNNING":
+                            conn.sendall(b"ERR instance not running\n")
+                            conn.close()
+                            continue
+                        if not getattr(inst, 'is_attachable', False):
+                            conn.sendall(b"ERR instance not attachable (not started with PTY)\n")
+                            conn.close()
+                            continue
+                        self.manager.pty_manager.attach(inst.pid, conn)
+                        attached = True
+                    else:
+                        # Première instance RUNNING + attachable
+                        for inst in program.processes:
+                            if inst.state.name == "RUNNING" and getattr(inst, 'is_attachable', False):
+                                self.manager.pty_manager.attach(inst.pid, conn)
+                                attached = True
+                                break
+
+                    if not attached:
+                        conn.sendall(b"ERR no running attachable instance\n")
+                        conn.close()
+
+                    # Dans tous les cas on passe à la connexion suivante.
+                    # Si attached=True, conn est maintenant gérée par le thread bridge du PTYManager.
+                    continue
 
                 # --- COMMANDES NORMALES ---
-                response = handle_command(self.manager, command)  # Traite la commande via le handler
-                conn.sendall((response + "\n").encode())  # Envoie la réponse au client
+                response = handle_command(self.manager, command)
+                conn.sendall((response + "\n").encode())
 
-                if command.strip() == "shutdown":  # Si commande shutdown
-                    log("[Socket] Shutdown requested")  # Log de l'arrêt
-                    self.running = False  # Arrête la boucle serveur
-                    self.cleanup()  # Nettoie les ressources
-                    os._exit(0)  # Termine immédiatement le processus
+                if command.strip() == "shutdown":
+                    log("[Socket] Shutdown requested")
+                    self.running = False
+                    self.cleanup()
+                    os._exit(0)
 
-                conn.close()  # Ferme la connexion client
+                conn.close()
 
-            except Exception as e:  # Capture toute erreur
-                log(f"[Socket] Error: {e}", level="ERROR")  # Log l'erreur avec niveau ERROR
+            except Exception as e:
+                log(f"[Socket] Error: {e}", level="ERROR")
 
-    def cleanup(self):  # Méthode de nettoyage du serveur
-        try:  # Tentative de nettoyage
-            self.server.close()  # Ferme le socket serveur
-            os.remove(SOCKET_PATH)  # Supprime le fichier socket
-        except Exception:  # Si une erreur survient
-            pass  # Ignore silencieusement
+    def cleanup(self):
+        try:
+            self.server.close()
+            os.remove(SOCKET_PATH)
+        except Exception:
+            pass

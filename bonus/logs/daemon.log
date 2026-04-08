@@ -128,3 +128,517 @@ AttributeError: 'ProcessManager' object has no attribute 'pty_manager'
 [94m[2026-04-07 22:34:48] [DEBUG] [INSTANCE] program=multi_proc pid=28585 state=ProcessState.STOPPED stop_reason=None[0m
 [94m[2026-04-07 22:34:48] [DEBUG] [LIFETIME] program=multi_proc pid=28585 alive_time=15.47s startsecs=0[0m
 [94m[2026-04-07 22:34:48] [DEBUG] [DECISION] program=multi_proc pid=28585 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[92m[2026-04-08 10:29:54] [INFO] [Daemon] Loading configuration without autostart[0m
+Traceback (most recent call last):
+  File "/Users/imac21/projects/new/bonus/daemon.py", line 118, in <module>
+    main()  # Lance main
+    ~~~~^^
+  File "/Users/imac21/projects/new/bonus/daemon.py", line 74, in main
+    programs = loader.load()  # Charge programmes
+  File "/Users/imac21/projects/new/config/loader.py", line 10, in load
+    with open(self.path, "r") as f:  # Ouvre le fichier en lecture
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'start'
+[92m[2026-04-08 10:30:03] [INFO] [Daemon] Loading configuration without autostart[0m
+Traceback (most recent call last):
+  File "/Users/imac21/projects/new/bonus/daemon.py", line 118, in <module>
+    main()  # Lance main
+    ~~~~^^
+  File "/Users/imac21/projects/new/bonus/daemon.py", line 74, in main
+    programs = loader.load()  # Charge programmes
+  File "/Users/imac21/projects/new/config/loader.py", line 10, in load
+    with open(self.path, "r") as f:  # Ouvre le fichier en lecture
+         ~~~~^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'stop'
+[92m[2026-04-08 10:30:21] [INFO] [Daemon] Loading configuration without autostart[0m
+[DEBUG] Starting program fast_ok as imac21
+[92m[2026-04-08 10:30:21] [INFO] Started 'fast_ok' with pid 25518[0m
+[DEBUG] Starting program slow_start as imac21
+[92m[2026-04-08 10:30:21] [INFO] Started 'slow_start' with pid 25519[0m
+[DEBUG] Starting program crash_loop as imac21
+[92m[2026-04-08 10:30:21] [INFO] Started 'crash_loop' with pid 25520[0m
+[92m[2026-04-08 10:30:21] [INFO] Started 'crash_loop' with pid 25521[0m
+[DEBUG] Starting program multi_proc as imac21
+[92m[2026-04-08 10:30:21] [INFO] Started 'multi_proc' with pid 25522[0m
+[92m[2026-04-08 10:30:21] [INFO] Started 'multi_proc' with pid 25523[0m
+[92m[2026-04-08 10:30:21] [INFO] Started 'multi_proc' with pid 25524[0m
+[DEBUG] Starting program shell as diablo
+[92m[2026-04-08 10:30:21] [INFO] Started 'shell' with pid 25525[0m
+[2026-04-08 10:30:21] [WARNING] [ALERT] daemon_started {'pid': 25517}
+[2026-04-08 10:30:21] [WARNING] [ALERT] daemon_started {'pid': 25517}
+[ERROR] User 'diablo' not found, running as current user
+[94m[2026-04-08 10:30:22] [DEBUG] [SIGCHLD] pid=25521 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:30:22] [DEBUG] [INSTANCE] program=crash_loop pid=25521 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:22] [DEBUG] [LIFETIME] program=crash_loop pid=25521 alive_time=1.11s startsecs=0[0m
+[94m[2026-04-08 10:30:22] [DEBUG] [DECISION] program=crash_loop pid=25521 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:30:22] [INFO] Started 'crash_loop' with pid 25551[0m
+[94m[2026-04-08 10:30:22] [DEBUG] [SIGCHLD] pid=25520 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:30:22] [DEBUG] [INSTANCE] program=crash_loop pid=25520 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:22] [DEBUG] [LIFETIME] program=crash_loop pid=25520 alive_time=1.12s startsecs=0[0m
+[94m[2026-04-08 10:30:22] [DEBUG] [DECISION] program=crash_loop pid=25520 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:30:22] [INFO] Started 'crash_loop' with pid 25552[0m
+[94m[2026-04-08 10:30:24] [DEBUG] [SIGCHLD] pid=25551 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:30:24] [DEBUG] [INSTANCE] program=crash_loop pid=25551 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:24] [DEBUG] [LIFETIME] program=crash_loop pid=25551 alive_time=1.52s startsecs=0[0m
+[94m[2026-04-08 10:30:24] [DEBUG] [DECISION] program=crash_loop pid=25551 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:30:24] [INFO] Started 'crash_loop' with pid 25556[0m
+[94m[2026-04-08 10:30:24] [DEBUG] [SIGCHLD] pid=25552 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:30:24] [DEBUG] [INSTANCE] program=crash_loop pid=25552 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:24] [DEBUG] [LIFETIME] program=crash_loop pid=25552 alive_time=1.52s startsecs=0[0m
+[94m[2026-04-08 10:30:24] [DEBUG] [DECISION] program=crash_loop pid=25552 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:30:24] [INFO] Started 'crash_loop' with pid 25557[0m
+[94m[2026-04-08 10:30:25] [DEBUG] [SIGCHLD] pid=25556 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:30:25] [DEBUG] [INSTANCE] program=crash_loop pid=25556 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:25] [DEBUG] [LIFETIME] program=crash_loop pid=25556 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:30:25] [DEBUG] [DECISION] program=crash_loop pid=25556 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:30:25] [INFO] Started 'crash_loop' with pid 25560[0m
+[94m[2026-04-08 10:30:25] [DEBUG] [SIGCHLD] pid=25557 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:30:25] [DEBUG] [INSTANCE] program=crash_loop pid=25557 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:25] [DEBUG] [LIFETIME] program=crash_loop pid=25557 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:30:25] [DEBUG] [DECISION] program=crash_loop pid=25557 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:30:25] [INFO] Started 'crash_loop' with pid 25561[0m
+[94m[2026-04-08 10:30:27] [DEBUG] [SIGCHLD] pid=25560 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:30:27] [DEBUG] [INSTANCE] program=crash_loop pid=25560 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:27] [DEBUG] [LIFETIME] program=crash_loop pid=25560 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:30:27] [DEBUG] [DECISION] program=crash_loop pid=25560 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[93m[2026-04-08 10:30:27] [WARNING] Giving up restarting 'crash_loop' after 3 retries[0m
+[94m[2026-04-08 10:30:27] [DEBUG] [SIGCHLD] pid=25561 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:30:27] [DEBUG] [INSTANCE] program=crash_loop pid=25561 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:27] [DEBUG] [LIFETIME] program=crash_loop pid=25561 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:30:27] [DEBUG] [DECISION] program=crash_loop pid=25561 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[93m[2026-04-08 10:30:27] [WARNING] Giving up restarting 'crash_loop' after 3 retries[0m
+[94m[2026-04-08 10:30:28] [DEBUG] [SIGCHLD] pid=25519 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:30:28] [DEBUG] [INSTANCE] program=slow_start pid=25519 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:28] [DEBUG] [LIFETIME] program=slow_start pid=25519 alive_time=6.67s startsecs=0[0m
+[94m[2026-04-08 10:30:28] [DEBUG] [DECISION] program=slow_start pid=25519 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[92m[2026-04-08 10:30:28] [INFO] Started 'slow_start' with pid 25564[0m
+[94m[2026-04-08 10:30:32] [DEBUG] [SIGCHLD] pid=25518 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:30:32] [DEBUG] [INSTANCE] program=fast_ok pid=25518 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:32] [DEBUG] [LIFETIME] program=fast_ok pid=25518 alive_time=10.68s startsecs=0[0m
+[94m[2026-04-08 10:30:32] [DEBUG] [DECISION] program=fast_ok pid=25518 restart_needed=False autorestart=never exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 10:30:35] [DEBUG] [SIGCHLD] pid=25564 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:30:35] [DEBUG] [INSTANCE] program=slow_start pid=25564 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:35] [DEBUG] [LIFETIME] program=slow_start pid=25564 alive_time=7.01s startsecs=0[0m
+[94m[2026-04-08 10:30:35] [DEBUG] [DECISION] program=slow_start pid=25564 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[92m[2026-04-08 10:30:35] [INFO] Started 'slow_start' with pid 25566[0m
+[94m[2026-04-08 10:30:37] [DEBUG] [SIGCHLD] pid=25524 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:30:37] [DEBUG] [INSTANCE] program=multi_proc pid=25524 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:37] [DEBUG] [LIFETIME] program=multi_proc pid=25524 alive_time=15.67s startsecs=0[0m
+[94m[2026-04-08 10:30:37] [DEBUG] [DECISION] program=multi_proc pid=25524 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 10:30:37] [DEBUG] [SIGCHLD] pid=25523 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:30:37] [DEBUG] [INSTANCE] program=multi_proc pid=25523 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:37] [DEBUG] [LIFETIME] program=multi_proc pid=25523 alive_time=15.68s startsecs=0[0m
+[94m[2026-04-08 10:30:37] [DEBUG] [DECISION] program=multi_proc pid=25523 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 10:30:37] [DEBUG] [SIGCHLD] pid=25522 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:30:37] [DEBUG] [INSTANCE] program=multi_proc pid=25522 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:37] [DEBUG] [LIFETIME] program=multi_proc pid=25522 alive_time=15.68s startsecs=0[0m
+[94m[2026-04-08 10:30:37] [DEBUG] [DECISION] program=multi_proc pid=25522 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 10:30:42] [DEBUG] [SIGCHLD] pid=25566 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:30:42] [DEBUG] [INSTANCE] program=slow_start pid=25566 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:30:42] [DEBUG] [LIFETIME] program=slow_start pid=25566 alive_time=7.01s startsecs=0[0m
+[94m[2026-04-08 10:30:42] [DEBUG] [DECISION] program=slow_start pid=25566 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[93m[2026-04-08 10:30:42] [WARNING] Giving up restarting 'slow_start' after 2 retries[0m
+[92m[2026-04-08 10:30:48] [INFO] Started 'manual_only' with pid 25586[0m
+[94m[2026-04-08 10:31:08] [DEBUG] [SIGCHLD] pid=25586 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:31:08] [DEBUG] [INSTANCE] program=manual_only pid=25586 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:31:08] [DEBUG] [LIFETIME] program=manual_only pid=25586 alive_time=20.24s startsecs=0[0m
+[94m[2026-04-08 10:31:08] [DEBUG] [DECISION] program=manual_only pid=25586 restart_needed=False autorestart=never exit_code=0 exitcodes=[0][0m
+[2026-04-08 10:35:46] [WARNING] [ALERT] daemon_stopping {'signal': 15}
+[2026-04-08 10:35:46] [WARNING] [ALERT] daemon_stopping {'signal': 15}
+[2026-04-08 10:35:46] [INFO] [Daemon] SIGTERM received, stopping all programs...
+[2026-04-08 10:35:46] [INFO] [Daemon] SIGTERM received, stopping all programs...
+[2026-04-08 10:35:46] [WARNING] [ALERT] process_stopped {'program': 'shell', 'pid': 25525}
+[2026-04-08 10:35:46] [WARNING] [ALERT] process_stopped {'program': 'shell', 'pid': 25525}
+[92m[2026-04-08 10:35:46] [INFO] Stopped 'shell' pid=25525[0m
+[92m[2026-04-08 10:35:52] [INFO] [Daemon] Loading configuration without autostart[0m
+[DEBUG] Starting program fast_ok as imac21
+[92m[2026-04-08 10:35:52] [INFO] Started 'fast_ok' with pid 25799[0m
+[DEBUG] Starting program slow_start as imac21
+[92m[2026-04-08 10:35:52] [INFO] Started 'slow_start' with pid 25800[0m
+[DEBUG] Starting program crash_loop as imac21
+[92m[2026-04-08 10:35:52] [INFO] Started 'crash_loop' with pid 25801[0m
+[92m[2026-04-08 10:35:52] [INFO] Started 'crash_loop' with pid 25802[0m
+[DEBUG] Starting program multi_proc as imac21
+[92m[2026-04-08 10:35:52] [INFO] Started 'multi_proc' with pid 25803[0m
+[92m[2026-04-08 10:35:52] [INFO] Started 'multi_proc' with pid 25804[0m
+[92m[2026-04-08 10:35:52] [INFO] Started 'multi_proc' with pid 25805[0m
+[DEBUG] Starting program shell as diablo
+[92m[2026-04-08 10:35:52] [INFO] Started 'shell' with pid 25806[0m
+[2026-04-08 10:35:52] [WARNING] [ALERT] daemon_started {'pid': 25798}
+[2026-04-08 10:35:52] [WARNING] [ALERT] daemon_started {'pid': 25798}
+[ERROR] User 'diablo' not found, running as current user
+[94m[2026-04-08 10:35:53] [DEBUG] [SIGCHLD] pid=25801 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:35:53] [DEBUG] [INSTANCE] program=crash_loop pid=25801 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:35:53] [DEBUG] [LIFETIME] program=crash_loop pid=25801 alive_time=1.05s startsecs=0[0m
+[94m[2026-04-08 10:35:53] [DEBUG] [DECISION] program=crash_loop pid=25801 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:35:53] [INFO] Started 'crash_loop' with pid 25832[0m
+[94m[2026-04-08 10:35:53] [DEBUG] [SIGCHLD] pid=25802 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:35:53] [DEBUG] [INSTANCE] program=crash_loop pid=25802 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:35:53] [DEBUG] [LIFETIME] program=crash_loop pid=25802 alive_time=1.05s startsecs=0[0m
+[94m[2026-04-08 10:35:53] [DEBUG] [DECISION] program=crash_loop pid=25802 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:35:53] [INFO] Started 'crash_loop' with pid 25833[0m
+[94m[2026-04-08 10:35:54] [DEBUG] [SIGCHLD] pid=25832 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:35:54] [DEBUG] [INSTANCE] program=crash_loop pid=25832 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:35:54] [DEBUG] [LIFETIME] program=crash_loop pid=25832 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:35:54] [DEBUG] [DECISION] program=crash_loop pid=25832 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:35:54] [INFO] Started 'crash_loop' with pid 25837[0m
+[94m[2026-04-08 10:35:54] [DEBUG] [SIGCHLD] pid=25833 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:35:54] [DEBUG] [INSTANCE] program=crash_loop pid=25833 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:35:54] [DEBUG] [LIFETIME] program=crash_loop pid=25833 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:35:54] [DEBUG] [DECISION] program=crash_loop pid=25833 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:35:54] [INFO] Started 'crash_loop' with pid 25838[0m
+[94m[2026-04-08 10:35:56] [DEBUG] [SIGCHLD] pid=25837 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:35:56] [DEBUG] [INSTANCE] program=crash_loop pid=25837 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:35:56] [DEBUG] [LIFETIME] program=crash_loop pid=25837 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:35:56] [DEBUG] [DECISION] program=crash_loop pid=25837 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:35:56] [INFO] Started 'crash_loop' with pid 25841[0m
+[94m[2026-04-08 10:35:56] [DEBUG] [SIGCHLD] pid=25838 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:35:56] [DEBUG] [INSTANCE] program=crash_loop pid=25838 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:35:56] [DEBUG] [LIFETIME] program=crash_loop pid=25838 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:35:56] [DEBUG] [DECISION] program=crash_loop pid=25838 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:35:56] [INFO] Started 'crash_loop' with pid 25842[0m
+[94m[2026-04-08 10:35:57] [DEBUG] [SIGCHLD] pid=25841 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:35:57] [DEBUG] [INSTANCE] program=crash_loop pid=25841 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:35:57] [DEBUG] [LIFETIME] program=crash_loop pid=25841 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:35:57] [DEBUG] [DECISION] program=crash_loop pid=25841 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[93m[2026-04-08 10:35:57] [WARNING] Giving up restarting 'crash_loop' after 3 retries[0m
+[94m[2026-04-08 10:35:57] [DEBUG] [SIGCHLD] pid=25842 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:35:57] [DEBUG] [INSTANCE] program=crash_loop pid=25842 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:35:57] [DEBUG] [LIFETIME] program=crash_loop pid=25842 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:35:57] [DEBUG] [DECISION] program=crash_loop pid=25842 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[93m[2026-04-08 10:35:57] [WARNING] Giving up restarting 'crash_loop' after 3 retries[0m
+[94m[2026-04-08 10:35:59] [DEBUG] [SIGCHLD] pid=25800 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:35:59] [DEBUG] [INSTANCE] program=slow_start pid=25800 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:35:59] [DEBUG] [LIFETIME] program=slow_start pid=25800 alive_time=7.08s startsecs=0[0m
+[94m[2026-04-08 10:35:59] [DEBUG] [DECISION] program=slow_start pid=25800 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[92m[2026-04-08 10:35:59] [INFO] Started 'slow_start' with pid 25845[0m
+[94m[2026-04-08 10:36:03] [DEBUG] [SIGCHLD] pid=25799 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:36:03] [DEBUG] [INSTANCE] program=fast_ok pid=25799 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:36:03] [DEBUG] [LIFETIME] program=fast_ok pid=25799 alive_time=11.09s startsecs=0[0m
+[94m[2026-04-08 10:36:03] [DEBUG] [DECISION] program=fast_ok pid=25799 restart_needed=False autorestart=never exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 10:36:06] [DEBUG] [SIGCHLD] pid=25845 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:36:06] [DEBUG] [INSTANCE] program=slow_start pid=25845 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:36:06] [DEBUG] [LIFETIME] program=slow_start pid=25845 alive_time=7.01s startsecs=0[0m
+[94m[2026-04-08 10:36:06] [DEBUG] [DECISION] program=slow_start pid=25845 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[92m[2026-04-08 10:36:06] [INFO] Started 'slow_start' with pid 25864[0m
+[94m[2026-04-08 10:36:08] [DEBUG] [SIGCHLD] pid=25803 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:36:08] [DEBUG] [INSTANCE] program=multi_proc pid=25803 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:36:08] [DEBUG] [LIFETIME] program=multi_proc pid=25803 alive_time=16.09s startsecs=0[0m
+[94m[2026-04-08 10:36:08] [DEBUG] [DECISION] program=multi_proc pid=25803 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 10:36:08] [DEBUG] [SIGCHLD] pid=25804 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:36:08] [DEBUG] [INSTANCE] program=multi_proc pid=25804 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:36:08] [DEBUG] [LIFETIME] program=multi_proc pid=25804 alive_time=16.09s startsecs=0[0m
+[94m[2026-04-08 10:36:08] [DEBUG] [DECISION] program=multi_proc pid=25804 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 10:36:08] [DEBUG] [SIGCHLD] pid=25805 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:36:08] [DEBUG] [INSTANCE] program=multi_proc pid=25805 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:36:08] [DEBUG] [LIFETIME] program=multi_proc pid=25805 alive_time=16.09s startsecs=0[0m
+[94m[2026-04-08 10:36:08] [DEBUG] [DECISION] program=multi_proc pid=25805 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 10:36:13] [DEBUG] [SIGCHLD] pid=25864 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:36:13] [DEBUG] [INSTANCE] program=slow_start pid=25864 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:36:13] [DEBUG] [LIFETIME] program=slow_start pid=25864 alive_time=7.01s startsecs=0[0m
+[94m[2026-04-08 10:36:13] [DEBUG] [DECISION] program=slow_start pid=25864 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[93m[2026-04-08 10:36:13] [WARNING] Giving up restarting 'slow_start' after 2 retries[0m
+[2026-04-08 10:40:31] [WARNING] [ALERT] daemon_stopping {'signal': 15}
+[2026-04-08 10:40:31] [WARNING] [ALERT] daemon_stopping {'signal': 15}
+[2026-04-08 10:40:31] [INFO] [Daemon] SIGTERM received, stopping all programs...
+[2026-04-08 10:40:31] [INFO] [Daemon] SIGTERM received, stopping all programs...
+[2026-04-08 10:40:31] [WARNING] [ALERT] process_stopped {'program': 'shell', 'pid': 25806}
+[2026-04-08 10:40:31] [WARNING] [ALERT] process_stopped {'program': 'shell', 'pid': 25806}
+[92m[2026-04-08 10:40:31] [INFO] Stopped 'shell' pid=25806[0m
+[92m[2026-04-08 10:40:36] [INFO] [Daemon] Loading configuration without autostart[0m
+[DEBUG] Starting program fast_ok as imac21
+[92m[2026-04-08 10:40:36] [INFO] Started 'fast_ok' with pid 25985[0m
+[DEBUG] Starting program slow_start as imac21
+[92m[2026-04-08 10:40:36] [INFO] Started 'slow_start' with pid 25986[0m
+[DEBUG] Starting program crash_loop as imac21
+[92m[2026-04-08 10:40:36] [INFO] Started 'crash_loop' with pid 25987[0m
+[92m[2026-04-08 10:40:36] [INFO] Started 'crash_loop' with pid 25988[0m
+[DEBUG] Starting program multi_proc as imac21
+[92m[2026-04-08 10:40:36] [INFO] Started 'multi_proc' with pid 25989[0m
+[92m[2026-04-08 10:40:36] [INFO] Started 'multi_proc' with pid 25990[0m
+[92m[2026-04-08 10:40:36] [INFO] Started 'multi_proc' with pid 25991[0m
+[DEBUG] Starting program shell as diablo
+[92m[2026-04-08 10:40:36] [INFO] Started 'shell' with pid 25992[0m
+[2026-04-08 10:40:36] [WARNING] [ALERT] daemon_started {'pid': 25984}
+[2026-04-08 10:40:36] [WARNING] [ALERT] daemon_started {'pid': 25984}
+[ERROR] User 'diablo' not found, running as current user
+[94m[2026-04-08 10:40:37] [DEBUG] [SIGCHLD] pid=25987 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:40:37] [DEBUG] [INSTANCE] program=crash_loop pid=25987 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:37] [DEBUG] [LIFETIME] program=crash_loop pid=25987 alive_time=1.05s startsecs=0[0m
+[94m[2026-04-08 10:40:37] [DEBUG] [DECISION] program=crash_loop pid=25987 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:40:37] [INFO] Started 'crash_loop' with pid 26018[0m
+[94m[2026-04-08 10:40:37] [DEBUG] [SIGCHLD] pid=25988 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:40:37] [DEBUG] [INSTANCE] program=crash_loop pid=25988 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:37] [DEBUG] [LIFETIME] program=crash_loop pid=25988 alive_time=1.05s startsecs=0[0m
+[94m[2026-04-08 10:40:37] [DEBUG] [DECISION] program=crash_loop pid=25988 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:40:37] [INFO] Started 'crash_loop' with pid 26019[0m
+[94m[2026-04-08 10:40:38] [DEBUG] [SIGCHLD] pid=26019 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:40:38] [DEBUG] [INSTANCE] program=crash_loop pid=26019 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:38] [DEBUG] [LIFETIME] program=crash_loop pid=26019 alive_time=1.50s startsecs=0[0m
+[94m[2026-04-08 10:40:38] [DEBUG] [DECISION] program=crash_loop pid=26019 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:40:38] [INFO] Started 'crash_loop' with pid 26022[0m
+[94m[2026-04-08 10:40:38] [DEBUG] [SIGCHLD] pid=26018 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:40:38] [DEBUG] [INSTANCE] program=crash_loop pid=26018 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:38] [DEBUG] [LIFETIME] program=crash_loop pid=26018 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:40:38] [DEBUG] [DECISION] program=crash_loop pid=26018 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:40:38] [INFO] Started 'crash_loop' with pid 26023[0m
+[94m[2026-04-08 10:40:40] [DEBUG] [SIGCHLD] pid=26023 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:40:40] [DEBUG] [INSTANCE] program=crash_loop pid=26023 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:40] [DEBUG] [LIFETIME] program=crash_loop pid=26023 alive_time=1.44s startsecs=0[0m
+[94m[2026-04-08 10:40:40] [DEBUG] [DECISION] program=crash_loop pid=26023 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:40:40] [INFO] Started 'crash_loop' with pid 26027[0m
+[94m[2026-04-08 10:40:40] [DEBUG] [SIGCHLD] pid=26022 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:40:40] [DEBUG] [INSTANCE] program=crash_loop pid=26022 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:40] [DEBUG] [LIFETIME] program=crash_loop pid=26022 alive_time=1.45s startsecs=0[0m
+[94m[2026-04-08 10:40:40] [DEBUG] [DECISION] program=crash_loop pid=26022 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:40:40] [INFO] Started 'crash_loop' with pid 26028[0m
+[94m[2026-04-08 10:40:41] [DEBUG] [SIGCHLD] pid=26027 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:40:41] [DEBUG] [INSTANCE] program=crash_loop pid=26027 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:41] [DEBUG] [LIFETIME] program=crash_loop pid=26027 alive_time=1.06s startsecs=0[0m
+[94m[2026-04-08 10:40:41] [DEBUG] [DECISION] program=crash_loop pid=26027 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[93m[2026-04-08 10:40:41] [WARNING] Giving up restarting 'crash_loop' after 3 retries[0m
+[94m[2026-04-08 10:40:41] [DEBUG] [SIGCHLD] pid=26028 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:40:41] [DEBUG] [INSTANCE] program=crash_loop pid=26028 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:41] [DEBUG] [LIFETIME] program=crash_loop pid=26028 alive_time=1.06s startsecs=0[0m
+[94m[2026-04-08 10:40:41] [DEBUG] [DECISION] program=crash_loop pid=26028 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[93m[2026-04-08 10:40:41] [WARNING] Giving up restarting 'crash_loop' after 3 retries[0m
+[94m[2026-04-08 10:40:43] [DEBUG] [SIGCHLD] pid=25986 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:40:43] [DEBUG] [INSTANCE] program=slow_start pid=25986 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:43] [DEBUG] [LIFETIME] program=slow_start pid=25986 alive_time=7.07s startsecs=0[0m
+[94m[2026-04-08 10:40:43] [DEBUG] [DECISION] program=slow_start pid=25986 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[92m[2026-04-08 10:40:43] [INFO] Started 'slow_start' with pid 26047[0m
+[94m[2026-04-08 10:40:47] [DEBUG] [SIGCHLD] pid=25985 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:40:47] [DEBUG] [INSTANCE] program=fast_ok pid=25985 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:47] [DEBUG] [LIFETIME] program=fast_ok pid=25985 alive_time=11.08s startsecs=0[0m
+[94m[2026-04-08 10:40:47] [DEBUG] [DECISION] program=fast_ok pid=25985 restart_needed=False autorestart=never exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 10:40:50] [DEBUG] [SIGCHLD] pid=26047 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:40:50] [DEBUG] [INSTANCE] program=slow_start pid=26047 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:50] [DEBUG] [LIFETIME] program=slow_start pid=26047 alive_time=7.01s startsecs=0[0m
+[94m[2026-04-08 10:40:50] [DEBUG] [DECISION] program=slow_start pid=26047 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[92m[2026-04-08 10:40:50] [INFO] Started 'slow_start' with pid 26051[0m
+[94m[2026-04-08 10:40:52] [DEBUG] [SIGCHLD] pid=25989 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:40:52] [DEBUG] [INSTANCE] program=multi_proc pid=25989 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:52] [DEBUG] [LIFETIME] program=multi_proc pid=25989 alive_time=16.08s startsecs=0[0m
+[94m[2026-04-08 10:40:52] [DEBUG] [DECISION] program=multi_proc pid=25989 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 10:40:52] [DEBUG] [SIGCHLD] pid=25990 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:40:52] [DEBUG] [INSTANCE] program=multi_proc pid=25990 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:52] [DEBUG] [LIFETIME] program=multi_proc pid=25990 alive_time=16.08s startsecs=0[0m
+[94m[2026-04-08 10:40:52] [DEBUG] [DECISION] program=multi_proc pid=25990 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 10:40:52] [DEBUG] [SIGCHLD] pid=25991 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:40:52] [DEBUG] [INSTANCE] program=multi_proc pid=25991 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:52] [DEBUG] [LIFETIME] program=multi_proc pid=25991 alive_time=16.08s startsecs=0[0m
+[94m[2026-04-08 10:40:52] [DEBUG] [DECISION] program=multi_proc pid=25991 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 10:40:57] [DEBUG] [SIGCHLD] pid=26051 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:40:57] [DEBUG] [INSTANCE] program=slow_start pid=26051 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:40:57] [DEBUG] [LIFETIME] program=slow_start pid=26051 alive_time=7.01s startsecs=0[0m
+[94m[2026-04-08 10:40:57] [DEBUG] [DECISION] program=slow_start pid=26051 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[93m[2026-04-08 10:40:57] [WARNING] Giving up restarting 'slow_start' after 2 retries[0m
+[2026-04-08 10:59:44] [WARNING] [ALERT] daemon_stopping {'signal': 15}
+[2026-04-08 10:59:44] [WARNING] [ALERT] daemon_stopping {'signal': 15}
+[2026-04-08 10:59:44] [INFO] [Daemon] SIGTERM received, stopping all programs...
+[2026-04-08 10:59:44] [INFO] [Daemon] SIGTERM received, stopping all programs...
+[2026-04-08 10:59:44] [WARNING] [ALERT] process_stopped {'program': 'shell', 'pid': 25992}
+[2026-04-08 10:59:44] [WARNING] [ALERT] process_stopped {'program': 'shell', 'pid': 25992}
+[92m[2026-04-08 10:59:44] [INFO] Stopped 'shell' pid=25992[0m
+[92m[2026-04-08 10:59:49] [INFO] [Daemon] Loading configuration without autostart[0m
+[DEBUG] Starting program fast_ok as imac21
+[92m[2026-04-08 10:59:49] [INFO] Started 'fast_ok' with pid 26234[0m
+[DEBUG] Starting program slow_start as imac21
+[92m[2026-04-08 10:59:49] [INFO] Started 'slow_start' with pid 26235[0m
+[DEBUG] Starting program crash_loop as imac21
+[92m[2026-04-08 10:59:49] [INFO] Started 'crash_loop' with pid 26236[0m
+[92m[2026-04-08 10:59:49] [INFO] Started 'crash_loop' with pid 26237[0m
+[DEBUG] Starting program multi_proc as imac21
+[92m[2026-04-08 10:59:49] [INFO] Started 'multi_proc' with pid 26238[0m
+[92m[2026-04-08 10:59:49] [INFO] Started 'multi_proc' with pid 26239[0m
+[92m[2026-04-08 10:59:49] [INFO] Started 'multi_proc' with pid 26240[0m
+[DEBUG] Starting program shell as diablo
+[92m[2026-04-08 10:59:49] [INFO] Started 'shell' with pid 26241[0m
+[2026-04-08 10:59:49] [WARNING] [ALERT] daemon_started {'pid': 26233}
+[2026-04-08 10:59:49] [WARNING] [ALERT] daemon_started {'pid': 26233}
+[ERROR] User 'diablo' not found, running as current user
+[94m[2026-04-08 10:59:50] [DEBUG] [SIGCHLD] pid=26237 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:59:50] [DEBUG] [INSTANCE] program=crash_loop pid=26237 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:59:50] [DEBUG] [LIFETIME] program=crash_loop pid=26237 alive_time=1.11s startsecs=0[0m
+[94m[2026-04-08 10:59:50] [DEBUG] [DECISION] program=crash_loop pid=26237 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:59:50] [INFO] Started 'crash_loop' with pid 26267[0m
+[94m[2026-04-08 10:59:50] [DEBUG] [SIGCHLD] pid=26236 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:59:50] [DEBUG] [INSTANCE] program=crash_loop pid=26236 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:59:50] [DEBUG] [LIFETIME] program=crash_loop pid=26236 alive_time=1.11s startsecs=0[0m
+[94m[2026-04-08 10:59:50] [DEBUG] [DECISION] program=crash_loop pid=26236 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:59:50] [INFO] Started 'crash_loop' with pid 26268[0m
+[94m[2026-04-08 10:59:52] [DEBUG] [SIGCHLD] pid=26267 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:59:52] [DEBUG] [INSTANCE] program=crash_loop pid=26267 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:59:52] [DEBUG] [LIFETIME] program=crash_loop pid=26267 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:59:52] [DEBUG] [DECISION] program=crash_loop pid=26267 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:59:52] [INFO] Started 'crash_loop' with pid 26271[0m
+[94m[2026-04-08 10:59:52] [DEBUG] [SIGCHLD] pid=26268 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:59:52] [DEBUG] [INSTANCE] program=crash_loop pid=26268 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:59:52] [DEBUG] [LIFETIME] program=crash_loop pid=26268 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:59:52] [DEBUG] [DECISION] program=crash_loop pid=26268 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:59:52] [INFO] Started 'crash_loop' with pid 26272[0m
+[94m[2026-04-08 10:59:53] [DEBUG] [SIGCHLD] pid=26271 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:59:53] [DEBUG] [INSTANCE] program=crash_loop pid=26271 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:59:53] [DEBUG] [LIFETIME] program=crash_loop pid=26271 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:59:53] [DEBUG] [DECISION] program=crash_loop pid=26271 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:59:53] [INFO] Started 'crash_loop' with pid 26292[0m
+[94m[2026-04-08 10:59:53] [DEBUG] [SIGCHLD] pid=26272 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:59:53] [DEBUG] [INSTANCE] program=crash_loop pid=26272 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:59:53] [DEBUG] [LIFETIME] program=crash_loop pid=26272 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:59:53] [DEBUG] [DECISION] program=crash_loop pid=26272 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 10:59:53] [INFO] Started 'crash_loop' with pid 26293[0m
+[94m[2026-04-08 10:59:55] [DEBUG] [SIGCHLD] pid=26292 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:59:55] [DEBUG] [INSTANCE] program=crash_loop pid=26292 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:59:55] [DEBUG] [LIFETIME] program=crash_loop pid=26292 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:59:55] [DEBUG] [DECISION] program=crash_loop pid=26292 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[93m[2026-04-08 10:59:55] [WARNING] Giving up restarting 'crash_loop' after 3 retries[0m
+[94m[2026-04-08 10:59:55] [DEBUG] [SIGCHLD] pid=26293 exit_code=1 reloading=False[0m
+[94m[2026-04-08 10:59:55] [DEBUG] [INSTANCE] program=crash_loop pid=26293 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:59:55] [DEBUG] [LIFETIME] program=crash_loop pid=26293 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 10:59:55] [DEBUG] [DECISION] program=crash_loop pid=26293 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[93m[2026-04-08 10:59:55] [WARNING] Giving up restarting 'crash_loop' after 3 retries[0m
+[94m[2026-04-08 10:59:56] [DEBUG] [SIGCHLD] pid=26235 exit_code=0 reloading=False[0m
+[94m[2026-04-08 10:59:56] [DEBUG] [INSTANCE] program=slow_start pid=26235 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 10:59:56] [DEBUG] [LIFETIME] program=slow_start pid=26235 alive_time=6.64s startsecs=0[0m
+[94m[2026-04-08 10:59:56] [DEBUG] [DECISION] program=slow_start pid=26235 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[92m[2026-04-08 10:59:56] [INFO] Started 'slow_start' with pid 26297[0m
+[94m[2026-04-08 11:00:00] [DEBUG] [SIGCHLD] pid=26234 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:00:00] [DEBUG] [INSTANCE] program=fast_ok pid=26234 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:00:00] [DEBUG] [LIFETIME] program=fast_ok pid=26234 alive_time=10.65s startsecs=0[0m
+[94m[2026-04-08 11:00:00] [DEBUG] [DECISION] program=fast_ok pid=26234 restart_needed=False autorestart=never exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 11:00:03] [DEBUG] [SIGCHLD] pid=26297 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:00:03] [DEBUG] [INSTANCE] program=slow_start pid=26297 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:00:03] [DEBUG] [LIFETIME] program=slow_start pid=26297 alive_time=7.01s startsecs=0[0m
+[94m[2026-04-08 11:00:03] [DEBUG] [DECISION] program=slow_start pid=26297 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[92m[2026-04-08 11:00:03] [INFO] Started 'slow_start' with pid 26301[0m
+[94m[2026-04-08 11:00:05] [DEBUG] [SIGCHLD] pid=26239 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:00:05] [DEBUG] [INSTANCE] program=multi_proc pid=26239 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:00:05] [DEBUG] [LIFETIME] program=multi_proc pid=26239 alive_time=15.65s startsecs=0[0m
+[94m[2026-04-08 11:00:05] [DEBUG] [DECISION] program=multi_proc pid=26239 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 11:00:05] [DEBUG] [SIGCHLD] pid=26238 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:00:05] [DEBUG] [INSTANCE] program=multi_proc pid=26238 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:00:05] [DEBUG] [LIFETIME] program=multi_proc pid=26238 alive_time=15.65s startsecs=0[0m
+[94m[2026-04-08 11:00:05] [DEBUG] [DECISION] program=multi_proc pid=26238 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 11:00:05] [DEBUG] [SIGCHLD] pid=26240 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:00:05] [DEBUG] [INSTANCE] program=multi_proc pid=26240 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:00:05] [DEBUG] [LIFETIME] program=multi_proc pid=26240 alive_time=15.65s startsecs=0[0m
+[94m[2026-04-08 11:00:05] [DEBUG] [DECISION] program=multi_proc pid=26240 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 11:00:10] [DEBUG] [SIGCHLD] pid=26301 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:00:10] [DEBUG] [INSTANCE] program=slow_start pid=26301 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:00:10] [DEBUG] [LIFETIME] program=slow_start pid=26301 alive_time=7.01s startsecs=0[0m
+[94m[2026-04-08 11:00:10] [DEBUG] [DECISION] program=slow_start pid=26301 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[93m[2026-04-08 11:00:10] [WARNING] Giving up restarting 'slow_start' after 2 retries[0m
+[2026-04-08 11:02:28] [WARNING] [ALERT] daemon_stopping {'signal': 15}
+[2026-04-08 11:02:28] [WARNING] [ALERT] daemon_stopping {'signal': 15}
+[2026-04-08 11:02:28] [INFO] [Daemon] SIGTERM received, stopping all programs...
+[2026-04-08 11:02:28] [INFO] [Daemon] SIGTERM received, stopping all programs...
+[2026-04-08 11:02:28] [WARNING] [ALERT] process_stopped {'program': 'shell', 'pid': 26241}
+[2026-04-08 11:02:28] [WARNING] [ALERT] process_stopped {'program': 'shell', 'pid': 26241}
+[92m[2026-04-08 11:02:28] [INFO] Stopped 'shell' pid=26241[0m
+[92m[2026-04-08 11:02:34] [INFO] [Daemon] Loading configuration without autostart[0m
+[DEBUG] Starting program fast_ok as imac21
+[92m[2026-04-08 11:02:34] [INFO] Started 'fast_ok' with pid 26418[0m
+[DEBUG] Starting program slow_start as imac21
+[92m[2026-04-08 11:02:34] [INFO] Started 'slow_start' with pid 26419[0m
+[DEBUG] Starting program crash_loop as imac21
+[92m[2026-04-08 11:02:34] [INFO] Started 'crash_loop' with pid 26420[0m
+[92m[2026-04-08 11:02:34] [INFO] Started 'crash_loop' with pid 26421[0m
+[DEBUG] Starting program multi_proc as imac21
+[92m[2026-04-08 11:02:34] [INFO] Started 'multi_proc' with pid 26422[0m
+[92m[2026-04-08 11:02:34] [INFO] Started 'multi_proc' with pid 26423[0m
+[92m[2026-04-08 11:02:34] [INFO] Started 'multi_proc' with pid 26424[0m
+[DEBUG] Starting program shell as diablo
+[92m[2026-04-08 11:02:34] [INFO] Started 'shell' with pid 26426[0m
+[2026-04-08 11:02:34] [WARNING] [ALERT] daemon_started {'pid': 26417}
+[2026-04-08 11:02:34] [WARNING] [ALERT] daemon_started {'pid': 26417}
+[ERROR] User 'diablo' not found, running as current user
+[94m[2026-04-08 11:02:35] [DEBUG] [SIGCHLD] pid=26421 exit_code=1 reloading=False[0m
+[94m[2026-04-08 11:02:35] [DEBUG] [INSTANCE] program=crash_loop pid=26421 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:35] [DEBUG] [LIFETIME] program=crash_loop pid=26421 alive_time=1.04s startsecs=0[0m
+[94m[2026-04-08 11:02:35] [DEBUG] [DECISION] program=crash_loop pid=26421 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 11:02:35] [INFO] Started 'crash_loop' with pid 26451[0m
+[94m[2026-04-08 11:02:35] [DEBUG] [SIGCHLD] pid=26420 exit_code=1 reloading=False[0m
+[94m[2026-04-08 11:02:35] [DEBUG] [INSTANCE] program=crash_loop pid=26420 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:35] [DEBUG] [LIFETIME] program=crash_loop pid=26420 alive_time=1.05s startsecs=0[0m
+[94m[2026-04-08 11:02:35] [DEBUG] [DECISION] program=crash_loop pid=26420 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 11:02:35] [INFO] Started 'crash_loop' with pid 26452[0m
+[94m[2026-04-08 11:02:36] [DEBUG] [SIGCHLD] pid=26451 exit_code=1 reloading=False[0m
+[94m[2026-04-08 11:02:36] [DEBUG] [INSTANCE] program=crash_loop pid=26451 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:36] [DEBUG] [LIFETIME] program=crash_loop pid=26451 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 11:02:36] [DEBUG] [DECISION] program=crash_loop pid=26451 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 11:02:36] [INFO] Started 'crash_loop' with pid 26455[0m
+[94m[2026-04-08 11:02:36] [DEBUG] [SIGCHLD] pid=26452 exit_code=1 reloading=False[0m
+[94m[2026-04-08 11:02:36] [DEBUG] [INSTANCE] program=crash_loop pid=26452 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:36] [DEBUG] [LIFETIME] program=crash_loop pid=26452 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 11:02:36] [DEBUG] [DECISION] program=crash_loop pid=26452 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 11:02:36] [INFO] Started 'crash_loop' with pid 26456[0m
+[94m[2026-04-08 11:02:38] [DEBUG] [SIGCHLD] pid=26455 exit_code=1 reloading=False[0m
+[94m[2026-04-08 11:02:38] [DEBUG] [INSTANCE] program=crash_loop pid=26455 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:38] [DEBUG] [LIFETIME] program=crash_loop pid=26455 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 11:02:38] [DEBUG] [DECISION] program=crash_loop pid=26455 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 11:02:38] [INFO] Started 'crash_loop' with pid 26476[0m
+[94m[2026-04-08 11:02:38] [DEBUG] [SIGCHLD] pid=26456 exit_code=1 reloading=False[0m
+[94m[2026-04-08 11:02:38] [DEBUG] [INSTANCE] program=crash_loop pid=26456 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:38] [DEBUG] [LIFETIME] program=crash_loop pid=26456 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 11:02:38] [DEBUG] [DECISION] program=crash_loop pid=26456 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[92m[2026-04-08 11:02:38] [INFO] Started 'crash_loop' with pid 26477[0m
+[94m[2026-04-08 11:02:39] [DEBUG] [SIGCHLD] pid=26476 exit_code=1 reloading=False[0m
+[94m[2026-04-08 11:02:39] [DEBUG] [INSTANCE] program=crash_loop pid=26476 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:39] [DEBUG] [LIFETIME] program=crash_loop pid=26476 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 11:02:39] [DEBUG] [DECISION] program=crash_loop pid=26476 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[93m[2026-04-08 11:02:39] [WARNING] Giving up restarting 'crash_loop' after 3 retries[0m
+[94m[2026-04-08 11:02:39] [DEBUG] [SIGCHLD] pid=26477 exit_code=1 reloading=False[0m
+[94m[2026-04-08 11:02:39] [DEBUG] [INSTANCE] program=crash_loop pid=26477 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:39] [DEBUG] [LIFETIME] program=crash_loop pid=26477 alive_time=1.51s startsecs=0[0m
+[94m[2026-04-08 11:02:39] [DEBUG] [DECISION] program=crash_loop pid=26477 restart_needed=True autorestart=always exit_code=1 exitcodes=[0][0m
+[93m[2026-04-08 11:02:39] [WARNING] Giving up restarting 'crash_loop' after 3 retries[0m
+[94m[2026-04-08 11:02:41] [DEBUG] [SIGCHLD] pid=26419 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:02:41] [DEBUG] [INSTANCE] program=slow_start pid=26419 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:41] [DEBUG] [LIFETIME] program=slow_start pid=26419 alive_time=7.09s startsecs=0[0m
+[94m[2026-04-08 11:02:41] [DEBUG] [DECISION] program=slow_start pid=26419 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[92m[2026-04-08 11:02:41] [INFO] Started 'slow_start' with pid 26481[0m
+[94m[2026-04-08 11:02:45] [DEBUG] [SIGCHLD] pid=26418 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:02:45] [DEBUG] [INSTANCE] program=fast_ok pid=26418 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:45] [DEBUG] [LIFETIME] program=fast_ok pid=26418 alive_time=11.10s startsecs=0[0m
+[94m[2026-04-08 11:02:45] [DEBUG] [DECISION] program=fast_ok pid=26418 restart_needed=False autorestart=never exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 11:02:48] [DEBUG] [SIGCHLD] pid=26481 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:02:48] [DEBUG] [INSTANCE] program=slow_start pid=26481 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:48] [DEBUG] [LIFETIME] program=slow_start pid=26481 alive_time=7.01s startsecs=0[0m
+[94m[2026-04-08 11:02:48] [DEBUG] [DECISION] program=slow_start pid=26481 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[92m[2026-04-08 11:02:48] [INFO] Started 'slow_start' with pid 26485[0m
+Exception in thread Thread-2 (bridge):
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/imac21/projects/new/bonus/pty_manager.py", line 101, in bridge
+    client_socket.shutdown(socket.SHUT_RDWR)  # ← ajout
+                           ^^^^^^
+NameError: name 'socket' is not defined. Did you forget to import 'socket'?
+[94m[2026-04-08 11:02:50] [DEBUG] [SIGCHLD] pid=26423 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:02:50] [DEBUG] [INSTANCE] program=multi_proc pid=26423 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:50] [DEBUG] [LIFETIME] program=multi_proc pid=26423 alive_time=16.09s startsecs=0[0m
+[94m[2026-04-08 11:02:50] [DEBUG] [DECISION] program=multi_proc pid=26423 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 11:02:50] [DEBUG] [SIGCHLD] pid=26422 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:02:50] [DEBUG] [INSTANCE] program=multi_proc pid=26422 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:50] [DEBUG] [LIFETIME] program=multi_proc pid=26422 alive_time=16.09s startsecs=0[0m
+[94m[2026-04-08 11:02:50] [DEBUG] [DECISION] program=multi_proc pid=26422 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 11:02:50] [DEBUG] [SIGCHLD] pid=26424 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:02:50] [DEBUG] [INSTANCE] program=multi_proc pid=26424 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:50] [DEBUG] [LIFETIME] program=multi_proc pid=26424 alive_time=16.09s startsecs=0[0m
+[94m[2026-04-08 11:02:50] [DEBUG] [DECISION] program=multi_proc pid=26424 restart_needed=False autorestart=unexpected exit_code=0 exitcodes=[0][0m
+[94m[2026-04-08 11:02:55] [DEBUG] [SIGCHLD] pid=26485 exit_code=0 reloading=False[0m
+[94m[2026-04-08 11:02:55] [DEBUG] [INSTANCE] program=slow_start pid=26485 state=ProcessState.STOPPED stop_reason=None[0m
+[94m[2026-04-08 11:02:55] [DEBUG] [LIFETIME] program=slow_start pid=26485 alive_time=7.01s startsecs=0[0m
+[94m[2026-04-08 11:02:55] [DEBUG] [DECISION] program=slow_start pid=26485 restart_needed=True autorestart=always exit_code=0 exitcodes=[0][0m
+[93m[2026-04-08 11:02:55] [WARNING] Giving up restarting 'slow_start' after 2 retries[0m
+[2026-04-08 11:03:21] [WARNING] [ALERT] daemon_stopping {'signal': 15}
+[2026-04-08 11:03:21] [WARNING] [ALERT] daemon_stopping {'signal': 15}
+[2026-04-08 11:03:21] [INFO] [Daemon] SIGTERM received, stopping all programs...
+[2026-04-08 11:03:21] [INFO] [Daemon] SIGTERM received, stopping all programs...
+[2026-04-08 11:03:21] [WARNING] [ALERT] process_stopped {'program': 'shell', 'pid': 26426}
+[2026-04-08 11:03:21] [WARNING] [ALERT] process_stopped {'program': 'shell', 'pid': 26426}
+[92m[2026-04-08 11:03:21] [INFO] Stopped 'shell' pid=26426[0m

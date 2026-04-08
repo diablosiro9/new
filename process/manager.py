@@ -1,167 +1,203 @@
-# process/manager.py  # Indique le chemin du fichier dans le projet
+# process/manager.py
 
-import os  # Module pour gérer les processus et le système (fork, exec, etc.)
-import signal  # Module pour gérer les signaux Unix (SIGTERM, SIGCHLD, etc.)
-import time  # Module pour gérer le temps (sleep, timestamps)
-from process.program import Program  # Importe la classe Program (regroupe plusieurs instances)
-from process.instance import ProcessInstance  # Importe la classe représentant une instance de process
-from utils.enums import ProcessState  # Importe les états possibles d’un process
-from config.loader import ConfigLoader  # Importe le loader de configuration
-from datetime import datetime  # Module pour gérer les dates et heures
+import os
+import pty
+import pwd
+import signal
+import time
+from process.program import Program
+from process.instance import ProcessInstance
+from utils.enums import ProcessState
+from config.loader import ConfigLoader
+from datetime import datetime
 
-LOG_FILE = "/tmp/taskmaster.log"  # Fichier où seront écrits les logs
+LOG_FILE = "/tmp/taskmaster.log"
 
-class ProcessManager:  # Classe principale qui gère tous les processus
-    LOG_COLORS = {  # Dictionnaire pour colorer les logs dans le terminal
-        "DEBUG": "\033[94m",   # bleu clair
-        "INFO": "\033[92m",    # vert
-        "WARNING": "\033[93m", # jaune
-        "ERROR": "\033[91m",   # rouge
+class ProcessManager:
+    LOG_COLORS = {
+        "DEBUG": "\033[94m",
+        "INFO": "\033[92m",
+        "WARNING": "\033[93m",
+        "ERROR": "\033[91m",
     }
-    LOG_RESET = "\033[0m"  # Code pour reset la couleur du terminal
+    LOG_RESET = "\033[0m"
 
+    def __init__(self, config_path=None, log_level="DEBUG"):
+        self.programs = {}
+        self.config_path = config_path
+        self.reloading = False
+        self._exited_pids = []
+        self.manual_stop_pids = set()
+        self.reload_requested = False
+        self.log_level = log_level
+        self.log_file = open(LOG_FILE, "a")
+        self.pty_manager = None  # Sera injecté par ManagerWrapper
 
-    def __init__(self, config_path=None, log_level="DEBUG"):  # Constructeur
-        self.programs = {}  # Dictionnaire des programmes (nom -> Program)
-        self.config_path = config_path  # Chemin du fichier de config
-        self.reloading = False  # Indique si un reload est en cours
-        self._exited_pids = []  # Liste des processus terminés (PID + code)
-        self.manual_stop_pids = set()  # 🔹 Ensemble des PIDs arrêtés manuellement
-        self.reload_requested = False  # Flag déclenché par SIGHUP
-        self.log_level = log_level  # Niveau de log actuel
-        self.log_file = open(LOG_FILE, "a")  # Ouvre le fichier de log en mode append
+        signal.signal(signal.SIGCHLD, self.handle_sigchld)
+        signal.signal(signal.SIGHUP, self.handle_sighup)
 
-        # signaux
-        signal.signal(signal.SIGCHLD, self.handle_sigchld)  # Appelé quand un process enfant se termine
-        signal.signal(signal.SIGHUP, self.handle_sighup)  # Appelé pour recharger la config
-
-    def log(self, message, level="INFO"):  # Fonction de logging
-        levels_order = ["DEBUG", "INFO", "WARNING", "ERROR"]  # Ordre des niveaux
-        if levels_order.index(level) < levels_order.index(self.log_level):  # Si niveau trop faible
-            return  # Ignore le message
-        timestamp = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")  # Génère un timestamp
-        color = self.LOG_COLORS.get(level, "")  # Récupère la couleur associée
-        reset = self.LOG_RESET  # Reset couleur
-        print(f"{color}{timestamp} [{level}] {message}{reset}", flush=True)  # Affiche dans le terminal
-        self.log_file.write(message + "\n")  # Écrit dans le fichier log
-        self.log_file.flush()  # Force l’écriture immédiate
+    def log(self, message, level="INFO"):
+        levels_order = ["DEBUG", "INFO", "WARNING", "ERROR"]
+        if levels_order.index(level) < levels_order.index(self.log_level):
+            return
+        timestamp = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
+        color = self.LOG_COLORS.get(level, "")
+        reset = self.LOG_RESET
+        print(f"{color}{timestamp} [{level}] {message}{reset}", flush=True)
+        self.log_file.write(message + "\n")
+        self.log_file.flush()
 
     # =========================
     # Program management
     # =========================
 
-    def add_program(self, program: Program):  # Ajoute un programme
-        self.programs[program.config.name] = program  # Stocke dans le dict
+    def add_program(self, program: Program):
+        self.programs[program.config.name] = program
 
-    def start_program(self, name: str):  # Démarre un programme
-        program = self.programs.get(name)  # Récupère le programme
-        if not program:  # Si inexistant
-            self.log(f"Program '{name}' not found")  # Log erreur
-            return
-        for inst in program.processes:  # Parcourt les instances
-            if inst.state == ProcessState.STOPPED:  # Si arrêtée
-                self._start_instance(program, inst)  # Lance l’instance
-
-    def _start_instance(self, program, inst):
-        use_pty = getattr(program.config, 'attachable', False)
-        
-        if use_pty:
-            import pty
-            master_fd, slave_fd = pty.openpty()
-        
-        pid = os.fork()
-        if pid == 0:  # enfant
-            if use_pty:
-                os.close(master_fd)
-                os.dup2(slave_fd, 0)  # stdin
-                os.dup2(slave_fd, 1)  # stdout
-                os.dup2(slave_fd, 2)  # stderr
-                os.close(slave_fd)
-            else:
-                # ton code stdout/stderr existant
-                if program.config.stdout:
-                    fd_out = os.open(program.config.stdout, os.O_CREAT | os.O_WRONLY | os.O_APPEND, 0o644)
-                    os.dup2(fd_out, 1)
-                    os.close(fd_out)
-                if program.config.stderr:
-                    fd_err = os.open(program.config.stderr, os.O_CREAT | os.O_WRONLY | os.O_APPEND, 0o644)
-                    os.dup2(fd_err, 2)
-                    os.close(fd_err)
-            # ... reste du code enfant inchangé
-            os.execv("/bin/sh", ["sh", "-c", program.config.cmd])
-        else:  # parent
-            if use_pty:
-                os.close(slave_fd)
-                inst.is_attachable = True
-                # Enregistrer dans le pty_manager (via le wrapper)
-                if hasattr(self, 'pty_manager'):
-                    self.pty_manager.register(pid, master_fd)
-            inst.mark_started(pid)
-            self.log(f"Started '{program.config.name}' with pid {pid}")
-
-    def stop_program(self, name: str):  # Stop un programme
-        program = self.programs.get(name)  # Récupère programme
+    def start_program(self, name: str):
+        program = self.programs.get(name)
         if not program:
             self.log(f"Program '{name}' not found")
             return
-        for inst in program.processes:  # Parcourt instances
-            if inst.state == ProcessState.RUNNING and inst.pid:  # Si actif
-                pid = inst.pid
-                self.manual_stop_pids.add(pid)  # 🔹 Marque comme stoppé manuellement
-                try:
-                    signal_to_send = getattr(program.config, "stopsignal", signal.SIGTERM)  # Choisit signal
-                    os.kill(pid, signal_to_send)  # Envoie signal
-                except ProcessLookupError:  # Si process déjà mort
-                    pass
-                inst.state = ProcessState.STOPPED  # Force état STOPPED
-                inst.stop_reason = "user"  # Raison arrêt
-                self.log(f"Stopped '{name}' pid={pid}")  # Log
+        for inst in program.processes:
+            if inst.state == ProcessState.STOPPED:
+                self._start_instance(program, inst)
 
-    def restart_program(self, name: str):  # Restart = stop + start
+    def _start_instance(self, program, inst):
+        use_pty = getattr(program.config, 'attachable', False)
+
+        master_fd = None
+        slave_fd = None
+        if use_pty:
+            master_fd, slave_fd = pty.openpty()
+
+        pid = os.fork()
+
+        if pid == 0:
+            # ── ENFANT ──────────────────────────────────────────
+            try:
+                # 1. Changer d'utilisateur si spécifié
+                user = getattr(program.config, 'user', None)
+                if user:
+                    try:
+                        pw = pwd.getpwnam(user)
+                        os.setgid(pw.pw_gid)
+                        os.setuid(pw.pw_uid)
+                        os.environ['HOME'] = pw.pw_dir
+                        os.environ['USER'] = pw.pw_name
+                        os.environ['LOGNAME'] = pw.pw_name
+                    except KeyError:
+                        print(f"[ERROR] User '{user}' not found, running as current user", flush=True)
+                    except PermissionError:
+                        print(f"[ERROR] Cannot switch to user '{user}' (not root?), running as current user", flush=True)
+
+                # 2. Redirections I/O
+                if use_pty:
+                    # Ferme le master dans l'enfant, branche le slave sur stdin/stdout/stderr
+                    os.close(master_fd)
+                    os.dup2(slave_fd, 0)
+                    os.dup2(slave_fd, 1)
+                    os.dup2(slave_fd, 2)
+                    if slave_fd > 2:
+                        os.close(slave_fd)
+                else:
+                    if program.config.stdout:
+                        fd_out = os.open(program.config.stdout, os.O_CREAT | os.O_WRONLY | os.O_APPEND, 0o644)
+                        os.dup2(fd_out, 1)
+                        os.close(fd_out)
+                    if program.config.stderr:
+                        fd_err = os.open(program.config.stderr, os.O_CREAT | os.O_WRONLY | os.O_APPEND, 0o644)
+                        os.dup2(fd_err, 2)
+                        os.close(fd_err)
+
+                # 3. Répertoire de travail
+                if getattr(program.config, 'workingdir', None):
+                    os.chdir(program.config.workingdir)
+
+                # 4. Umask
+                if getattr(program.config, 'umask', None) is not None:
+                    os.umask(program.config.umask)
+
+                # 5. Variables d'environnement
+                if getattr(program.config, 'env', None):
+                    os.environ.update(program.config.env)
+
+                # 6. Exec
+                os.execv("/bin/sh", ["sh", "-c", program.config.cmd])
+
+            except Exception as e:
+                print(f"[CHILD] Failed to exec '{program.config.cmd}': {e}", flush=True)
+                os._exit(1)
+
+        else:
+            # ── PARENT ──────────────────────────────────────────
+            if use_pty:
+                os.close(slave_fd)           # Le parent n'a pas besoin du slave
+                inst.is_attachable = True
+                if self.pty_manager is not None:
+                    self.pty_manager.register(pid, master_fd)
+                else:
+                    self.log(f"[WARNING] pty_manager not set, attach will not work for pid {pid}", level="WARNING")
+            inst.mark_started(pid)
+            self.log(f"Started '{program.config.name}' with pid {pid}")
+
+    def stop_program(self, name: str):
+        program = self.programs.get(name)
+        if not program:
+            self.log(f"Program '{name}' not found")
+            return
+        for inst in program.processes:
+            if inst.state == ProcessState.RUNNING and inst.pid:
+                pid = inst.pid
+                self.manual_stop_pids.add(pid)
+                try:
+                    signal_to_send = getattr(program.config, "stopsignal", signal.SIGTERM)
+                    os.kill(pid, signal_to_send)
+                except ProcessLookupError:
+                    pass
+                inst.state = ProcessState.STOPPED
+                inst.stop_reason = "user"
+                self.log(f"Stopped '{name}' pid={pid}")
+
+    def restart_program(self, name: str):
         self.stop_program(name)
         self.start_program(name)
 
     def get_status(self):
-        # 🔹 Traitement des processus terminés avant de renvoyer le status
         self.process_exited()
-
         status_lines = []
         for prog in self.programs.values():
             running = sum(1 for inst in prog.processes if inst.state == ProcessState.RUNNING)
             total = len(prog.processes)
             retries = sum(inst.retry_count for inst in prog.processes)
-            line = f"{prog.config.name}: { 'RUNNING' if running else 'STOPPED' } ({running}/{total}) retries={retries}"
+            line = f"{prog.config.name}: {'RUNNING' if running else 'STOPPED'} ({running}/{total}) retries={retries}"
             status_lines.append(line)
         return "\n".join(status_lines)
 
-    # 🔹 nouvelle méthode dans ProcessManager
     def update_status(self):
-        """
-        Force le traitement des processus terminés en attente (SIGCHLD)
-        pour que le status reflète immédiatement l'état réel.
-        """
         self.process_exited()
+
     # =========================
     # SIGCHLD
     # =========================
 
-    def handle_sigchld(self, signum, frame):  # Handler appelé quand un child meurt
+    def handle_sigchld(self, signum, frame):
         while True:
             try:
-                pid, status = os.waitpid(-1, os.WNOHANG)  # Récupère PID terminé sans bloquer
+                pid, status = os.waitpid(-1, os.WNOHANG)
                 if pid == 0:
                     break
-                exit_code = os.WEXITSTATUS(status) if os.WIFEXITED(status) else None  # Code sortie
-                self._exited_pids.append((pid, exit_code))  # Stocke
+                exit_code = os.WEXITSTATUS(status) if os.WIFEXITED(status) else None
+                self._exited_pids.append((pid, exit_code))
             except ChildProcessError:
                 break
 
-    def process_exited(self):  # Traite les processus terminés
-        while self._exited_pids:  # Tant qu’il y a des PIDs
-            pid, exit_code = self._exited_pids.pop(0)  # Récupère premier
+    def process_exited(self):
+        while self._exited_pids:
+            pid, exit_code = self._exited_pids.pop(0)
 
-            # Chercher l’instance correspondante au PID
             matched_inst = None
+            matched_prog = None
             for prog in self.programs.values():
                 for inst in prog.processes:
                     if inst.pid == pid:
@@ -175,7 +211,6 @@ class ProcessManager:  # Classe principale qui gère tous les processus
                 self.log(f"[SIGCHLD] Unknown PID {pid} exited with {exit_code}", level="DEBUG")
                 continue
 
-            # 🔹 ignore les PIDs stoppés manuellement
             if pid in self.manual_stop_pids:
                 self.manual_stop_pids.remove(pid)
                 matched_inst.stop_reason = "user"
@@ -190,6 +225,13 @@ class ProcessManager:  # Classe principale qui gère tous les processus
             matched_inst.mark_exited(exit_code)
             prog = matched_prog
             inst = matched_inst
+
+            # Nettoyer le PTY si le process était attachable
+            if self.pty_manager and pid in self.pty_manager.sessions:
+                try:
+                    os.close(self.pty_manager.sessions.pop(pid))
+                except OSError:
+                    pass
 
             self.log(
                 f"[INSTANCE] program={prog.config.name} pid={pid} "
@@ -218,8 +260,7 @@ class ProcessManager:  # Classe principale qui gère tous les processus
                     self.log(f"Max retries reached for '{prog.config.name}'")
 
             elif prog.config.autorestart == "always":
-                if exit_code not in exitcodes:
-                    restart_needed = True
+                restart_needed = True
 
             elif prog.config.autorestart == "unexpected":
                 if exit_code not in exitcodes or alive_time < startsecs:
@@ -243,6 +284,7 @@ class ProcessManager:  # Classe principale qui gère tous les processus
                     continue
 
                 inst.retry_count += 1
+                inst.state = ProcessState.STOPPED  # reset pour que _start_instance accepte l'instance
                 self._start_instance(prog, inst)
 
     # =========================
