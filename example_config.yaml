@@ -7,7 +7,7 @@ programs:
     autorestart: never
     stdout: "/tmp/fast_ok.out"
     stderr: "/tmp/fast_ok.err"
-    startsecs: 1
+    starttime: 1
     startretries: 1
     exitcodes: [0]
 
@@ -18,7 +18,7 @@ programs:
     autorestart: always
     stdout: "/tmp/slow_start.out"
     stderr: "/tmp/slow_start.err"
-    startsecs: 5
+    starttime: 5
     startretries: 2
     exitcodes: [0]
 
@@ -29,7 +29,7 @@ programs:
     autorestart: always
     stdout: "/tmp/crash_loop.out"
     stderr: "/tmp/crash_loop.err"
-    startsecs: 3
+    starttime: 3
     startretries: 3
     exitcodes: [0]
 
@@ -40,7 +40,7 @@ programs:
     autorestart: never
     stdout: "/tmp/manual_only.out"
     stderr: "/tmp/manual_only.err"
-    startsecs: 1
+    starttime: 1
     startretries: 0
     exitcodes: [0]
 
@@ -51,6 +51,6 @@ programs:
     autorestart: unexpected
     stdout: "/tmp/multi_proc.out"
     stderr: "/tmp/multi_proc.err"
-    startsecs: 2
+    starttime: 2
     startretries: 1
     exitcodes: [0]
