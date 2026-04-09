@@ -1,10 +1,10 @@
 # bonus/alerting.py
 import json
 import time
-import requests  # pour envoyer des POST HTTP
+import requests
 
 ALERT_FILE = "/tmp/taskmaster_alerts.log"
-WEBHOOK_URL = "http://localhost:8080"  # ton webhook_browser
+WEBHOOK_URL = "http://localhost:8080"
 
 def send_alert(event, payload):
     alert = {
@@ -13,11 +13,9 @@ def send_alert(event, payload):
         "payload": payload,
     }
 
-    # 1. Log dans fichier local
     with open(ALERT_FILE, "a") as f:
         f.write(json.dumps(alert) + "\n")
 
-    # 2. Envoi vers le serveur HTTP local
     try:
         requests.post(WEBHOOK_URL, json=alert, timeout=0.5)
     except Exception as e:

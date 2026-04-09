@@ -1,55 +1,55 @@
-from utils.enums import ProcessState  # Importe un enum représentant les états possibles d’un process
-import time  # Module pour gérer le temps (sleep, uptime, etc.)
-import readline  # Module pour gérer l’entrée utilisateur avec historique et autocomplétion
-import rlcompleter  # Module pour l’autocomplétion
-import os  # Module pour interagir avec le système (fichiers, chemins, etc.)
+from utils.enums import ProcessState
+import time
+import readline
+import rlcompleter 
+import os
 import select
 import sys
 
-readline.parse_and_bind("bind ^I rl_complete")  # Active l’autocomplétion avec la touche TAB
+readline.parse_and_bind("bind ^I rl_complete")
 
-HISTORY_FILE = os.path.expanduser("~/.taskmaster_history")  # Définit le fichier où l’historique sera sauvegardé
+HISTORY_FILE = os.path.expanduser("~/.taskmaster_history")  
 
-class ControlShell:  # Déclare la classe ControlShell (le shell interactif)
-    def __init__(self, manager):  # Constructeur de la classe avec un manager en paramètre
+class ControlShell: 
+    def __init__(self, manager):  
         try:
-            readline.read_history_file(HISTORY_FILE)  # Charge l’historique des commandes précédentes
-        except FileNotFoundError:  # Si le fichier n’existe pas
-            pass  # Ignore l’erreur
-        self.manager = manager  # Stocke le manager pour gérer les process
-        self.running = True  # Indique que le shell est actif
-        readline.set_history_length(100)  # Limite l’historique à 100 commandes
+            readline.read_history_file(HISTORY_FILE) 
+        except FileNotFoundError:
+            pass
+        self.manager = manager  
+        self.running = True 
+        readline.set_history_length(100) 
 
-        self.commands = ["start", "stop", "restart", "reload", "status", "exit"]  # Liste des commandes disponibles
-        readline.parse_and_bind("tab: complete")  # Active l’autocomplétion
-        readline.set_completer(self.complete)  # Définit la fonction de complétion personnalisée
-        readline.parse_and_bind("set show-all-if-ambiguous on")  # Affiche toutes les options si ambigu
-        readline.parse_and_bind("set completion-ignore-case on")  # Ignore la casse (maj/min)
-        readline.parse_and_bind("set completion-query-items 100")  # Nombre max d’options affichées
+        self.commands = ["start", "stop", "restart", "reload", "status", "exit"] 
+        readline.parse_and_bind("tab: complete")  
+        readline.set_completer(self.complete)  
+        readline.parse_and_bind("set show-all-if-ambiguous on") 
+        readline.parse_and_bind("set completion-ignore-case on") 
+        readline.parse_and_bind("set completion-query-items 100") 
         self.manager.prompt_redraw = self._redraw_prompt
     
     def _redraw_prompt(self):
         sys.stdout.write("taskmaster> ")
         sys.stdout.flush()
 
-    def complete(self, text, state):  # Fonction appelée pour l’autocomplétion
-        buffer = readline.get_line_buffer()  # Récupère le contenu actuel de la ligne
-        parts = buffer.split()  # Découpe la ligne en mots
+    def complete(self, text, state): 
+        buffer = readline.get_line_buffer()  
+        parts = buffer.split()  
 
-        if len(parts) == 1:  # Si on tape la première partie de la commande
-            options = [c for c in self.commands if c.startswith(parts[0])]  # Propose les commandes correspondantes
-        elif len(parts) == 2 and parts[0] in ("start", "stop", "restart", "status"):  # Si commande + argument
+        if len(parts) == 1: 
+            options = [c for c in self.commands if c.startswith(parts[0])] 
+        elif len(parts) == 2 and parts[0] in ("start", "stop", "restart", "status"): 
             options = [
-                name for name in self.manager.programs.keys()  # Récupère les noms des programmes
-                if name.startswith(parts[1])  # Filtre selon ce que l’utilisateur tape
+                name for name in self.manager.programs.keys() 
+                if name.startswith(parts[1]) 
             ]
         else:
-            options = []  # Sinon aucune suggestion
+            options = []  
 
         try:
-            return options[state]  # Retourne l’option correspondant à l’index demandé
-        except IndexError:  # Si aucune option
-            return None  # Ne retourne rien
+            return options[state] 
+        except IndexError:  
+            return None 
 
 
     def run(self):
@@ -70,7 +70,7 @@ class ControlShell:  # Déclare la classe ControlShell (le shell interactif)
 
                 try:
                     cmd = sys.stdin.readline()
-                    if cmd == "":  # EOF Ctrl+D
+                    if cmd == "": 
                         print()
                         for name in self.manager.programs.keys():
                             self.manager.stop_program(name)
@@ -135,22 +135,22 @@ class ControlShell:  # Déclare la classe ControlShell (le shell interactif)
         finally:
             readline.write_history_file(HISTORY_FILE)
                     
-    def format_status(self, name, program):  # Fonction pour formater l’affichage d’un programme
-        running = [p for p in program.processes if p.state == ProcessState.RUNNING]  # Liste des process actifs
-        stopped = [p for p in program.processes if p.state == ProcessState.STOPPED]  # Liste des process stoppés
+    def format_status(self, name, program):
+        running = [p for p in program.processes if p.state == ProcessState.RUNNING] 
+        stopped = [p for p in program.processes if p.state == ProcessState.STOPPED]  
 
-        retries = max((p.retry_count for p in program.processes), default=0)  # Nombre max de retries
-        uptime = None  # Initialise uptime
-        for p in running:  # Parcourt les process actifs
-            if p.start_time:  # Si heure de démarrage connue
-                uptime = int(time.time() - p.start_time)  # Calcule le temps écoulé
-                break  # Prend le premier trouvé
+        retries = max((p.retry_count for p in program.processes), default=0)
+        uptime = None 
+        for p in running: 
+            if p.start_time: 
+                uptime = int(time.time() - p.start_time)  
+                break 
 
-        state = "RUNNING" if running else "STOPPED"  # Détermine l’état global
-        uptime_str = f"{uptime}s" if uptime is not None else "-"  # Formate l’uptime
+        state = "RUNNING" if running else "STOPPED" 
+        uptime_str = f"{uptime}s" if uptime is not None else "-"  
 
-        return (  # Retourne une chaîne formatée
-            f"{name}: {state} "  # Nom + état
-            f"({len(running)}/{len(program.processes)}) "  # Nombre de process actifs / total
-            f"retries={retries} uptime={uptime_str}"  # Infos supplémentaires
+        return ( 
+            f"{name}: {state} "  
+            f"({len(running)}/{len(program.processes)}) " 
+            f"retries={retries} uptime={uptime_str}"  
         )

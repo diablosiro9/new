@@ -1,118 +1,112 @@
-import os  # Module système (fork, fichiers, PID, etc.)
-import sys  # Accès aux arguments et contrôle du programme
-import time  # Gestion du temps (sleep)
-import signal  # Gestion des signaux Unix
-import atexit  # Permet d’exécuter du code à la fin du programme
-import fcntl  # Gestion des locks fichiers (éviter plusieurs daemons)
-from socket_server import SocketServer  # Serveur socket pour communication client
-from bonus.manager_wrapper import ManagerWrapper  # Wrapper autour du ProcessManager
+import os
+import sys 
+import time 
+import signal 
+import atexit  
+import fcntl  
+from socket_server import SocketServer  
+from bonus.manager_wrapper import ManagerWrapper  
 
-PID_FILE = "/tmp/taskmaster_daemon.pid"  # Fichier pour stocker le PID du daemon
-LOCK_FILE = "/tmp/taskmaster_daemon.lock"  # Fichier de lock pour éviter double instance
-LOG_FILE = os.path.join(os.path.dirname(__file__), "logs/daemon.log")  # Fichier de log du daemon
+PID_FILE = "/tmp/taskmaster_daemon.pid" 
+LOCK_FILE = "/tmp/taskmaster_daemon.lock"  
+LOG_FILE = os.path.join(os.path.dirname(__file__), "logs/daemon.log")
 
-IS_DAEMON = False  # Flag global indiquant si on est en mode daemon
+IS_DAEMON = False 
 
-def daemonize(log_file=None):  # Fonction pour transformer le process en daemon
-    global IS_DAEMON  # Permet de modifier la variable globale
+def daemonize(log_file=None):  
+    global IS_DAEMON  
 
-    if os.fork() > 0:  # Premier fork
-        sys.exit(0)  # Le parent quitte
+    if os.fork() > 0:  
+        sys.exit(0)  
 
-    os.setsid()  # Crée une nouvelle session (détache du terminal)
+    os.setsid()  
 
-    if os.fork() > 0:  # Deuxième fork (évite réattachement terminal)
+    if os.fork() > 0:  
         sys.exit(0)
 
-    os.umask(0)  # Reset umask
+    os.umask(0)  
 
-    if log_file:  # Si fichier de log fourni
-        os.makedirs(os.path.dirname(log_file), exist_ok=True)  # Crée dossier logs si besoin
-        log_f = open(log_file, "a+", buffering=1)  # Ouvre fichier log en append (line buffered)
-        os.dup2(log_f.fileno(), 1)  # Redirige stdout vers log
-        os.dup2(log_f.fileno(), 2)  # Redirige stderr vers log
+    if log_file: 
+        os.makedirs(os.path.dirname(log_file), exist_ok=True)  
+        log_f = open(log_file, "a+", buffering=1)  
+        os.dup2(log_f.fileno(), 1)  
+        os.dup2(log_f.fileno(), 2)  
 
-    with open(PID_FILE, "w") as f:  # Écrit le PID dans un fichier
+    with open(PID_FILE, "w") as f:  
         f.write(str(os.getpid()))
 
-    atexit.register(lambda: os.path.exists(PID_FILE) and os.remove(PID_FILE))  # Supprime PID à la sortie
-    atexit.register(lambda: os.path.exists(LOCK_FILE) and os.remove(LOCK_FILE))  # Supprime lock à la sortie
+    atexit.register(lambda: os.path.exists(PID_FILE) and os.remove(PID_FILE))
+    atexit.register(lambda: os.path.exists(LOCK_FILE) and os.remove(LOCK_FILE))  
 
-    IS_DAEMON = True  # Active le mode daemon
+    IS_DAEMON = True  
 
-def acquire_lock():  # Empêche plusieurs instances du daemon
-    fd = os.open(LOCK_FILE, os.O_CREAT | os.O_RDWR)  # Ouvre/crée fichier lock
+def acquire_lock(): 
+    fd = os.open(LOCK_FILE, os.O_CREAT | os.O_RDWR) 
     try:
-        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)  # Lock exclusif non bloquant
-    except BlockingIOError:  # Si lock déjà pris
-        print("[TaskMaster] Daemon already running")  # Message erreur
-        sys.exit(1)  # Quitte
-    return fd  # Retourne descripteur
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)  
+    except BlockingIOError:  
+        print("[TaskMaster] Daemon already running") 
+        sys.exit(1)  
+    return fd  
 
-def main():  # Fonction principale
-    if len(sys.argv) < 2:  # Vérifie arguments
+def main(): 
+    if len(sys.argv) < 2: 
         print("Usage: daemon.py <config.yaml> [--no-daemon]")
         sys.exit(1)
 
-    config_path = sys.argv[1]  # Récupère fichier config
-    no_daemon = len(sys.argv) == 3 and sys.argv[2] == "--no-daemon"  # Mode debug sans daemon
+    config_path = sys.argv[1] 
+    no_daemon = len(sys.argv) == 3 and sys.argv[2] == "--no-daemon"
 
-    lock_fd = acquire_lock()  # Prend le lock
+    lock_fd = acquire_lock()
 
-    if not no_daemon:  # Si mode daemon actif
-        daemonize(log_file=LOG_FILE)  # Lance en daemon
+    if not no_daemon: 
+        daemonize(log_file=LOG_FILE) 
 
-    manager = ManagerWrapper(config_path, is_daemon=IS_DAEMON)  # Initialise manager wrapper
-    manager.manager.log("[Daemon] Loading configuration without autostart")  # Log
+    manager = ManagerWrapper(config_path, is_daemon=IS_DAEMON) 
+    manager.manager.log("[Daemon] Loading configuration without autostart") 
 
-    from config.loader import ConfigLoader  # Import local
+    from config.loader import ConfigLoader  
     from process.instance import ProcessInstance
     from utils.enums import ProcessState
 
-    # Charger la config
-    loader = ConfigLoader(config_path)  # Initialise loader
-    programs = loader.load()  # Charge programmes
+    
+    loader = ConfigLoader(config_path)  
+    programs = loader.load()  
 
-    for program in programs:  # Ajoute chaque programme
+    for program in programs:  
         manager.add_program(program)
 
-    # # 1️⃣ Initialiser toutes les instances avant autostart
-    # for prog in manager.manager.programs.values():  # Parcourt programmes
-    #     prog.processes = [ProcessInstance() for _ in range(prog.config.numprocs)]  # Crée instances
-    #     for inst in prog.processes:
-    #         inst.state = ProcessState.STOPPED  # Met état STOPPED
 
-    # 2️⃣ Lancer les programmes avec autostart
     for prog in manager.manager.programs.values():
-        if prog.config.autostart:  # Si autostart activé
+        if prog.config.autostart: 
             print(f"[DEBUG] Starting program {prog.config.name} as {prog.config.user}")
-            manager.start_program(prog.config.name)  # Démarre
+            manager.start_program(prog.config.name) 
 
-    manager.send_alert("daemon_started", {"pid": os.getpid()})  # Envoie event
+    manager.send_alert("daemon_started", {"pid": os.getpid()}) 
 
-    # Socket server pour communication
-    socket_server = SocketServer(manager)  # Initialise serveur socket
-    socket_server.start()  # Démarre serveur
+   
+    socket_server = SocketServer(manager)  
+    socket_server.start()  
 
-    # Gestion SIGTERM / SIGHUP
+
     def handle_term(signum, frame):
         manager.send_alert("daemon_stopping", {"signal": signum})
         manager.log("[Daemon] SIGTERM received, stopping all programs...")
-        for prog in manager.programs.values():  # ← manager ici est un ManagerWrapper
+        for prog in manager.programs.values():
             manager.stop_program(prog.config.name)
         sys.exit(0)
 
-    signal.signal(signal.SIGTERM, handle_term)  # Associe SIGTERM
-    signal.signal(signal.SIGHUP, lambda s,f: manager.reload_config())  # Reload config
+    signal.signal(signal.SIGTERM, handle_term) 
+    signal.signal(signal.SIGHUP, lambda s,f: manager.reload_config()) 
 
-    # Boucle principale
+
     while True:
         try:
-            manager.process_exited()  # Gère les process terminés
-            time.sleep(0.5)  # Pause
+            manager.process_exited()  
+            time.sleep(0.5)  
         except Exception as e:
-            manager.send_alert("daemon_exception", {"error": str(e)})  # Alerte
-            manager.log(f"[Daemon] Exception caught: {e}", level="ERROR")  # Log erreur
+            manager.send_alert("daemon_exception", {"error": str(e)}) 
+            manager.log(f"[Daemon] Exception caught: {e}", level="ERROR")
 
-if __name__ == "__main__":  # Si exécuté directement
-    main()  # Lance main
+if __name__ == "__main__":  
+    main()  

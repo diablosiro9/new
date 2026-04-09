@@ -32,7 +32,7 @@ class ProcessManager:
         self.reload_requested = False
         self.log_level = log_level
         self.log_file = open(LOG_FILE, "a")
-        self.pty_manager = None  # Sera injecté par ManagerWrapper
+        self.pty_manager = None  
 
         signal.signal(signal.SIGCHLD, self.handle_sigchld)
         signal.signal(signal.SIGHUP, self.handle_sighup)
@@ -70,8 +70,6 @@ class ProcessManager:
                 self._start_instance(program, inst)
 
     def _start_instance(self, program, inst):
-        # inst.retry_count = 0 
-        # inst.stop_reason = None
         use_pty = getattr(program.config, 'attachable', False)
 
         master_fd = None
@@ -84,7 +82,6 @@ class ProcessManager:
         if pid == 0:
             # ── ENFANT ──────────────────────────────────────────
             try:
-                # 1. Changer d'utilisateur si spécifié
                 user = getattr(program.config, 'user', None)
                 if user:
                     try:
@@ -101,7 +98,6 @@ class ProcessManager:
 
                 # 2. Redirections I/O
                 if use_pty:
-                    # Ferme le master dans l'enfant, branche le slave sur stdin/stdout/stderr
                     os.close(master_fd)
                     os.dup2(slave_fd, 0)
                     os.dup2(slave_fd, 1)
@@ -118,19 +114,15 @@ class ProcessManager:
                         os.dup2(fd_err, 2)
                         os.close(fd_err)
 
-                # 3. Répertoire de travail
                 if getattr(program.config, 'workingdir', None):
                     os.chdir(program.config.workingdir)
 
-                # 4. Umask
                 if getattr(program.config, 'umask', None) is not None:
                     os.umask(program.config.umask)
 
-                # 5. Variables d'environnement
                 if getattr(program.config, 'env', None):
                     os.environ.update(program.config.env)
 
-                # 6. Exec
                 os.execv("/bin/sh", ["sh", "-c", program.config.cmd])
 
             except Exception as e:
@@ -138,9 +130,8 @@ class ProcessManager:
                 os._exit(1)
 
         else:
-            # ── PARENT ──────────────────────────────────────────
             if use_pty:
-                os.close(slave_fd)           # Le parent n'a pas besoin du slave
+                os.close(slave_fd)        
                 inst.is_attachable = True
                 if self.pty_manager is not None:
                     self.pty_manager.register(pid, master_fd)
@@ -234,7 +225,6 @@ class ProcessManager:
             prog = matched_prog
             inst = matched_inst
 
-            # Nettoyer le PTY si le process était attachable
             if self.pty_manager and pid in self.pty_manager.sessions:
                 try:
                     os.close(self.pty_manager.sessions.pop(pid))
@@ -292,7 +282,7 @@ class ProcessManager:
                     continue
 
                 inst.retry_count += 1
-                inst.state = ProcessState.STOPPED  # reset pour que _start_instance accepte l'instance
+                inst.state = ProcessState.STOPPED 
                 self._start_instance(prog, inst)
 
     # =========================

@@ -1,43 +1,39 @@
-import os  # Importe le module os pour interagir avec le système (PID, fichiers, etc.)
-import sys  # Importe le module sys pour accéder aux arguments du programme et contrôler l'exécution
+import os
+import sys 
 from config.loader import ConfigLoader
 from process.manager import ProcessManager
-from shell.control import ControlShell  # Importe une classe qui gère le shell interactif (interface utilisateur)
+from shell.control import ControlShell 
 
-PID_FILE = "/tmp/taskmaster.pid"  # Définit le chemin d’un fichier où sera stocké le PID du programme
+PID_FILE = "/tmp/taskmaster.pid" 
 
-def main():  # Définit la fonction principale du programme
-    if len(sys.argv) != 2:  # Vérifie qu'il y a exactement 2 arguments (script + fichier config)
-        print("Usage: python3 main.py <config.yaml>")  # Affiche comment utiliser correctement le script
-        return  # Quitte la fonction si les arguments sont incorrects
+def main(): 
+    if len(sys.argv) != 2: 
+        print("Usage: python3 main.py <config.yaml>") 
+        return  
 
-    config_path = sys.argv[1]  # Récupère le chemin du fichier de configuration passé en argument
+    config_path = sys.argv[1] 
 
-    # Écrit le PID pour reload_monitor.py
-    with open(PID_FILE, "w") as f:  # Ouvre (ou crée) le fichier PID en écriture
-        f.write(str(os.getpid()))  # Écrit le PID (identifiant du processus actuel) dans le fichier
-    print(f"[TaskMaster] PID = {os.getpid()}")  # Affiche le PID dans le terminal
+    with open(PID_FILE, "w") as f: 
+        f.write(str(os.getpid())) 
+    print(f"[TaskMaster] PID = {os.getpid()}") 
 
-    # Crée le manager
-    manager = ProcessManager(config_path=config_path)  # Crée une instance du gestionnaire de processus avec le chemin de config
+    manager = ProcessManager(config_path=config_path)  
 
-    # Charge la config initiale
-    loader = ConfigLoader(config_path)  # Crée un chargeur de configuration avec le fichier donné
-    programs = loader.load()  # Charge les programmes définis dans le fichier config
-    for program in programs:  # Parcourt chaque programme récupéré
-        manager.add_program(program)  # Ajoute le programme au gestionnaire
-        if program.config.autostart:  # Vérifie si le programme doit démarrer automatiquement
-            manager.start_program(program.config.name)  # Lance le programme si autostart est activé
+    loader = ConfigLoader(config_path)
+    programs = loader.load()
+    for program in programs:
+        manager.add_program(program)
+        if program.config.autostart:  
+            manager.start_program(program.config.name) 
 
     manager.update_status()
-    # Lance le shell
-    shell = ControlShell(manager)  # Crée un shell interactif en lui passant le manager
+    shell = ControlShell(manager) 
     try:
-        shell.run()  # Lance la boucle du shell (attend des commandes utilisateur)
-    except KeyboardInterrupt:  # Capture l'interruption clavier (Ctrl+C)
-        print("\n[TaskMaster] Interrupted by user, shutting down cleanly")  # Affiche un message propre d’arrêt
-        sys.exit(0)  # Quitte proprement le programme avec code de sortie 0 (succès)
+        shell.run() 
+    except KeyboardInterrupt: 
+        print("\n[TaskMaster] Interrupted by user, shutting down cleanly") 
+        sys.exit(0) 
 
 
-if __name__ == "__main__":  # Vérifie que le script est exécuté directement (et non importé)
-    main()  # Appelle la fonction principale
+if __name__ == "__main__": 
+    main()

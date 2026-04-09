@@ -34,7 +34,6 @@ class SocketServer(threading.Thread):
                 command = data.decode().strip()
                 log(f"[Socket] Command received: {command}")
 
-                # --- ATTACH ---
                 if command.startswith("attach"):
                     parts = command.split()
                     if len(parts) < 2:
@@ -44,7 +43,6 @@ class SocketServer(threading.Thread):
 
                     target = parts[1]
 
-                    # Parse optionnel program:index
                     if ":" in target:
                         prog_name, idx_str = target.split(":", 1)
                         try:
@@ -55,7 +53,7 @@ class SocketServer(threading.Thread):
                             continue
                     else:
                         prog_name = target
-                        index = None  # Première instance RUNNING attachable
+                        index = None 
 
                     program = self.manager.programs.get(prog_name)
                     if not program:
@@ -63,10 +61,8 @@ class SocketServer(threading.Thread):
                         conn.close()
                         continue
 
-                    # Chercher l'instance cible
                     attached = False
                     if index is not None:
-                        # Instance précise demandée
                         if index >= len(program.processes):
                             conn.sendall(b"ERR instance index out of range\n")
                             conn.close()
@@ -83,7 +79,6 @@ class SocketServer(threading.Thread):
                         self.manager.pty_manager.attach(inst.pid, conn)
                         attached = True
                     else:
-                        # Première instance RUNNING + attachable
                         for inst in program.processes:
                             if inst.state.name == "RUNNING" and getattr(inst, 'is_attachable', False):
                                 self.manager.pty_manager.attach(inst.pid, conn)
@@ -94,11 +89,8 @@ class SocketServer(threading.Thread):
                         conn.sendall(b"ERR no running attachable instance\n")
                         conn.close()
 
-                    # Dans tous les cas on passe à la connexion suivante.
-                    # Si attached=True, conn est maintenant gérée par le thread bridge du PTYManager.
                     continue
 
-                # --- COMMANDES NORMALES ---
                 response = handle_command(self.manager, command)
                 conn.sendall((response + "\n").encode())
 

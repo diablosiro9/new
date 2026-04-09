@@ -45,16 +45,12 @@ class PTYManager:
                         if not data:
                             break
 
-                        # Ctrl+X détache immédiatement
                         if b"\x18" in data:
                             break
 
-                        # Accumule dans le buffer d'entrée
                         input_buffer += data
 
-                        # Traite ligne par ligne
                         detach_requested = False
-                        # Normalise \r et \r\n en \n
                         input_buffer = input_buffer.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
 
                         while b"\n" in input_buffer:
@@ -72,7 +68,6 @@ class PTYManager:
                         if detach_requested:
                             break
 
-                        # Forward ce qui reste (saisie partielle, pas encore \n)
                         if input_buffer and not detach_requested:
                             try:
                                 os.write(master_fd, input_buffer)
@@ -96,16 +91,13 @@ class PTYManager:
                 pass
             finally:
                 self.attached.discard(pid)
-                # \r\n pour reset le terminal + prompt explicite
                 try:
                     client_socket.sendall(b"\r\nDetached.\r\n")
                     client_socket.shutdown(socket.SHUT_RDWR)  # ← ajout
                     client_socket.close()       
                 except OSError:
                     pass
-                # Signal de fin de session pour que le client rende la main
-                # Si ton client écoute un sentinel, envoie-le ici
-                # ex: client_socket.sendall(b"__DETACHED__\n")
+             
 
         t = threading.Thread(target=bridge, daemon=True)
         t.start()

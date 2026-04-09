@@ -1,4 +1,3 @@
-# bonus/logging_utils.py
 from datetime import datetime
 import time
 

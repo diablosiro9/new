@@ -1,22 +1,22 @@
-import sys  # Module système (arguments, exit, etc.)
-import os  # Module système (paths, etc.)
+import sys 
+import os 
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Calcule le chemin racine du projet
-sys.path.insert(0, ROOT)  # Ajoute le root au PYTHONPATH pour les imports
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
+sys.path.insert(0, ROOT)  
 
-from utils.enums import ProcessState  # Import de l'état des processus
+from utils.enums import ProcessState 
 
-def handle_command(manager, command: str) -> str:  # Fonction principale de traitement des commandes
-    parts = command.strip().split()  # Découpe la commande en tokens
-    if not parts:  # Si la commande est vide
-        return "ERR empty command"  # Retour d'erreur
+def handle_command(manager, command: str) -> str:  
+    parts = command.strip().split()  
+    if not parts:  
+        return "ERR empty command"  
 
-    cmd = parts[0]  # Récupère le type de commande
+    cmd = parts[0] 
 
     if cmd == "status":
-        # Forcer le traitement des exits avant de lire l'état
+
         if hasattr(manager, 'manager'):
-            manager.manager.process_exited()  # si ManagerWrapper
+            manager.manager.process_exited()
         elif hasattr(manager, 'process_exited'):
             manager.process_exited()
         
@@ -28,24 +28,24 @@ def handle_command(manager, command: str) -> str:  # Fonction principale de trai
             lines.append(f"{name} {state} {running}/{desired}")
         return "\n".join(lines) if lines else "OK no programs"
 
-    elif cmd == "start":  # Commande start
-        if len(parts) != 2:  # Vérifie les arguments
-            return "ERR usage: start <program>"  # Message d'erreur
-        manager.start_program(parts[1])  # Lance le programme
-        return f"OK started {parts[1]}"  # Confirmation
+    elif cmd == "start":  
+        if len(parts) != 2: 
+            return "ERR usage: start <program>"  
+        manager.start_program(parts[1])  
+        return f"OK started {parts[1]}" 
 
-    elif cmd == "stop":  # Commande stop
-        if len(parts) != 2:  # Vérifie les arguments
-            return "ERR usage: stop <program>"  # Message d'erreur
-        manager.stop_program(parts[1])  # Stoppe le programme
-        return f"OK stopped {parts[1]}"  # Confirmation
+    elif cmd == "stop": 
+        if len(parts) != 2:  
+            return "ERR usage: stop <program>" 
+        manager.stop_program(parts[1])  
+        return f"OK stopped {parts[1]}"  
 
-    elif cmd == "reload":  # Commande reload
-        manager.reload_config()  # Recharge la configuration
-        return "OK reload done"  # Confirmation
+    elif cmd == "reload": 
+        manager.reload_config()  
+        return "OK reload done"  
 
-    elif cmd == "shutdown":  # Commande shutdown
-        return "OK shutdown"  # Indique arrêt
+    elif cmd == "shutdown":  
+        return "OK shutdown"  
 
     # elif cmd.startswith("attach"):  # Commande attach
     #     parts = cmd.split()  # Découpe la commande
