@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIG_FILE="example_config.yaml"
+CONFIG_FILE="school.yaml"
 VENV_DIR="venv"
 
 start() {

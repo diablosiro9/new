@@ -238,7 +238,7 @@ class ProcessManager:
                 f"state={inst.state} stop_reason={inst.stop_reason}", level="DEBUG"
             )
 
-            startsecs = getattr(prog.config, "startsecs", 0)
+            starttime = getattr(prog.config, "starttime", 0)
             retries = getattr(prog.config, "startretries", 0)
             exitcodes = getattr(prog.config, "exitcodes", [0])
             now = time.time()
@@ -246,12 +246,12 @@ class ProcessManager:
 
             self.log(
                 f"[LIFETIME] program={prog.config.name} pid={pid} "
-                f"alive_time={alive_time:.2f}s startsecs={startsecs}", level="DEBUG"
+                f"alive_time={alive_time:.2f}s starttime={starttime}", level="DEBUG"
             )
 
             restart_needed = False
 
-            if exit_code not in exitcodes and alive_time < startsecs:
+            if exit_code not in exitcodes and alive_time < starttime:
                 if inst.retry_count < retries:
                     inst.retry_count += 1
                     self.log(f"Retrying '{prog.config.name}' attempt {inst.retry_count}/{retries}")
@@ -263,7 +263,7 @@ class ProcessManager:
                 restart_needed = True
 
             elif prog.config.autorestart == "unexpected":
-                if exit_code not in exitcodes or alive_time < startsecs:
+                if exit_code not in exitcodes or alive_time < starttime:
                     restart_needed = True
 
             self.log(
@@ -318,8 +318,12 @@ class ProcessManager:
                     self.stop_program(name)
                     old_prog.config = new_prog.config
                     old_prog.processes = [ProcessInstance() for _ in range(new_prog.config.numprocs)]
-                    if old_prog.config.autostart:
+              
+                    was_manually_stopped = all(inst.stop_reason == "user" for inst in old_prog.processes)
+
+                    if old_prog.config.autostart and not was_manually_stopped:
                         self.start_program(name)
+
             else:
                 self.programs[name] = new_prog
                 if new_prog.config.autostart:
@@ -333,10 +337,19 @@ class ProcessManager:
             a.autorestart == b.autorestart and
             a.autostart == b.autostart and
             a.numprocs == b.numprocs and
+            a.starttime == b.starttime and
+            a.startretries == b.startretries and
+            a.exitcodes == b.exitcodes and
+            a.stopsignal == b.stopsignal and
+            a.stoptime == b.stoptime and
+            getattr(a, "attachable", False) == getattr(b, "attachable", False) and
             getattr(a, "stdout", None) == getattr(b, "stdout", None) and
-            getattr(a, "stderr", None) == getattr(b, "stderr", None)
+            getattr(a, "stderr", None) == getattr(b, "stderr", None) and
+            getattr(a, "env", None) == getattr(b, "env", None) and
+            getattr(a, "workingdir", None) == getattr(b, "workingdir", None) and
+            getattr(a, "umask", None) == getattr(b, "umask", None) and
+            getattr(a, "user", None) == getattr(b, "user", None)
         )
-
     # =========================
     # SIGHUP handler
     # =========================

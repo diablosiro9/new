@@ -27,8 +27,7 @@ class ConfigLoader:  # Classe responsable de charger et parser le fichier de con
                 stoptime=cfg.get("stoptime", 10),  # Temps avant arrêt forcé
                 stdout=cfg.get("stdout"),  # Fichier stdout
                 stderr=cfg.get("stderr"),  # Fichier stderr
-                env=cfg.get("env"),  # Variables d’environnement
-                workingdir=cfg.get("workingdir"),  # Répertoire de travail
+                env={k: str(v) for k, v in cfg.get("env", {}).items()} if cfg.get("env") else None,                workingdir=cfg.get("workingdir"),  # Répertoire de travail
                 umask=self._parse_umask(cfg.get("umask")),  # Convertit umask
                 attachable=cfg.get("attachable", False)  # Si attach possible
             )
