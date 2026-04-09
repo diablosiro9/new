@@ -3,6 +3,7 @@
 import os
 import pty
 import pwd
+import sys
 import signal
 import time
 from process.program import Program
@@ -43,9 +44,12 @@ class ProcessManager:
         timestamp = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
         color = self.LOG_COLORS.get(level, "")
         reset = self.LOG_RESET
+        sys.stdout.write("\r\033[K")
         print(f"{color}{timestamp} [{level}] {message}{reset}", flush=True)
         self.log_file.write(message + "\n")
         self.log_file.flush()
+        if hasattr(self, 'prompt_redraw') and self.prompt_redraw:
+            self.prompt_redraw()
 
     # =========================
     # Program management
@@ -61,9 +65,13 @@ class ProcessManager:
             return
         for inst in program.processes:
             if inst.state == ProcessState.STOPPED:
+                inst.retry_count = 0 
+                inst.stop_reason = None
                 self._start_instance(program, inst)
 
     def _start_instance(self, program, inst):
+        # inst.retry_count = 0 
+        # inst.stop_reason = None
         use_pty = getattr(program.config, 'attachable', False)
 
         master_fd = None

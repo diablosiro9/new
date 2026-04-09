@@ -3,6 +3,8 @@ import time  # Module pour gérer le temps (sleep, uptime, etc.)
 import readline  # Module pour gérer l’entrée utilisateur avec historique et autocomplétion
 import rlcompleter  # Module pour l’autocomplétion
 import os  # Module pour interagir avec le système (fichiers, chemins, etc.)
+import select
+import sys
 
 readline.parse_and_bind("bind ^I rl_complete")  # Active l’autocomplétion avec la touche TAB
 
@@ -24,6 +26,11 @@ class ControlShell:  # Déclare la classe ControlShell (le shell interactif)
         readline.parse_and_bind("set show-all-if-ambiguous on")  # Affiche toutes les options si ambigu
         readline.parse_and_bind("set completion-ignore-case on")  # Ignore la casse (maj/min)
         readline.parse_and_bind("set completion-query-items 100")  # Nombre max d’options affichées
+        self.manager.prompt_redraw = self._redraw_prompt
+    
+    def _redraw_prompt(self):
+        sys.stdout.write("taskmaster> ")
+        sys.stdout.flush()
 
     def complete(self, text, state):  # Fonction appelée pour l’autocomplétion
         buffer = readline.get_line_buffer()  # Récupère le contenu actuel de la ligne
@@ -45,73 +52,89 @@ class ControlShell:  # Déclare la classe ControlShell (le shell interactif)
             return None  # Ne retourne rien
 
 
-    def run(self):  # Fonction principale du shell (boucle interactive)
+    def run(self):
         try:
-            while self.running:  # Boucle tant que le shell est actif
-                # Gestion des process terminés
-                self.manager.process_exited()  # Vérifie les process terminés
+            sys.stdout.write("taskmaster> ")
+            sys.stdout.flush()
+            while self.running:
+                self.manager.process_exited()
 
-                # Traitement du reload demandé par SIGHUP (SAFE)
-                if self.manager.reload_requested:  # Si un reload a été demandé
-                    self.manager.reload_requested = False  # Reset du flag
-                    self.manager.log(
-                        "[TaskMaster] SIGHUP received, reloading configuration...",  # Message de log
-                        level="INFO"
-                    )
-                    self.manager.reload_config()  # Recharge la configuration
+                if self.manager.reload_requested:
+                    self.manager.reload_requested = False
+                    self.manager.log("[TaskMaster] SIGHUP received, reloading...", level="INFO")
+                    self.manager.reload_config()
+
+                ready, _, _ = select.select([sys.stdin], [], [], 0.5)
+                if not ready:
+                    continue
 
                 try:
-                    cmd = input("taskmaster> ").strip()  # Lit la commande utilisateur
-                    if cmd:  # Si la commande n’est pas vide
-                        readline.add_history(cmd)  # Ajoute à l’historique
-                except (KeyboardInterrupt, EOFError):  # Si Ctrl+C ou Ctrl+D
-                    print()  # Saut de ligne propre
-                    for name in self.manager.programs.keys():  # Parcourt tous les programmes
-                        self.manager.stop_program(name)  # Stoppe chaque programme
-                    break  # Sort de la boucle
+                    cmd = sys.stdin.readline()
+                    if cmd == "":  # EOF Ctrl+D
+                        print()
+                        for name in self.manager.programs.keys():
+                            self.manager.stop_program(name)
+                            self.manager.prompt_redraw = None
+                        break
+                    cmd = cmd.strip()
+                except KeyboardInterrupt:
+                    print()
+                    for name in self.manager.programs.keys():
+                        self.manager.stop_program(name)
+                        self.manager.prompt_redraw = None
+                    break
 
-                if cmd == "":  # Si commande vide
-                    continue  # Reboucle
-                elif cmd == "exit":  # Si commande exit
-                    for name in self.manager.programs.keys():  # Parcourt les programmes
-                        self.manager.stop_program(name)  # Les stoppe
-                    self.running = False  # Arrête la boucle
-                elif cmd.startswith("start "):  # Si commande start
-                    name = cmd.split(maxsplit=1)[1]  # Récupère le nom du programme
-                    self.manager.start_program(name)  # Lance le programme
-                elif cmd.startswith("stop "):  # Si commande stop
-                    name = cmd.split(maxsplit=1)[1]  # Récupère le nom
-                    self.manager.stop_program(name)  # Stoppe le programme
+                if not cmd:
+                    sys.stdout.write("taskmaster> ")
+                    sys.stdout.flush()
+                    continue
+
+                readline.add_history(cmd)
+
+                if cmd == "exit":
+                    for name in self.manager.programs.keys():
+                        self.manager.stop_program(name)
+                    self.running = False
+                    self.manager.prompt_redraw = None
+                    continue 
+                elif cmd.startswith("start "):
+                    name = cmd.split(maxsplit=1)[1].strip()
+                    self.manager.start_program(name)
+
+                elif cmd.startswith("stop "):
+                    name = cmd.split(maxsplit=1)[1].strip()
+                    self.manager.stop_program(name)
+
+                elif cmd.startswith("restart "):
+                    name = cmd.split(maxsplit=1)[1].strip()
+                    self.manager.restart_program(name)
+
                 elif cmd.startswith("status"):
-                    # 🔹 Traite immédiatement les SIGCHLD avant de calculer le status
-                    self.manager.process_exited()
-                    
                     parts = cmd.split()
                     if len(parts) == 1:
-                        for name, program in self.manager.programs.items():
-                            print(self.format_status(name, program))
+                        for pname, program in self.manager.programs.items():
+                            print(self.format_status(pname, program))
                     else:
-                        name = parts[1]
-                        program = self.manager.programs.get(name)
+                        pname = parts[1]
+                        program = self.manager.programs.get(pname)
                         if not program:
-                            print(f"Unknown program: {name}")
+                            print(f"Unknown program: {pname}")
                         else:
-                            print(self.format_status(name, program))  # Affiche son statut
-                elif cmd == "reload":  # Si commande reload
-                    self.manager.reload_config()  # Recharge la config
-                elif cmd.startswith("restart "):  # Si restart
-                    name = cmd.split(maxsplit=1)[1]  # Nom du programme
-                    self.manager.restart_program(name)  # Redémarre le programme
-                else:
-                    print(f"Unknown command: '{cmd}'")  # Commande inconnue
+                            print(self.format_status(pname, program))
 
-                time.sleep(0.1)  # Petite pause pour éviter de surcharger le CPU
+                elif cmd == "reload":
+                    self.manager.reload_config()
+                    continue
+
+                else:
+                    print(f"Unknown command: '{cmd}'")
+
+                sys.stdout.write("taskmaster> ")
+                sys.stdout.flush()
 
         finally:
-            # 🔹 Toujours sauvegarder l’historique
-            readline.write_history_file(HISTORY_FILE)  # Sauvegarde l’historique dans le fichier
-
-                
+            readline.write_history_file(HISTORY_FILE)
+                    
     def format_status(self, name, program):  # Fonction pour formater l’affichage d’un programme
         running = [p for p in program.processes if p.state == ProcessState.RUNNING]  # Liste des process actifs
         stopped = [p for p in program.processes if p.state == ProcessState.STOPPED]  # Liste des process stoppés
